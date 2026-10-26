@@ -1,0 +1,2691 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PHI-LAB v2.0 // Laboratorio Universale di Morfogenesi, Cristallografia, Biomeccanica & Analisi Aurea (φ)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <style>
+    :root {
+      --bg-obsidian: #080a0f;
+      --bg-slate: #10141d;
+      --bg-card: rgba(20, 26, 38, 0.78);
+      --bg-card-solid: #141a26;
+      --gold-primary: #d4af37;
+      --gold-bright: #f3e5ab;
+      --gold-muted: rgba(212, 175, 55, 0.28);
+      --gold-glow: rgba(212, 175, 55, 0.12);
+      --cyan-sci: #38bdf8;
+      --cyan-muted: rgba(56, 189, 248, 0.25);
+      --emerald-ok: #10b981;
+      --amber-warn: #f59e0b;
+      --crimson-myth: #f43f5e;
+      --violet-quant: #a855f7;
+      --text-main: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --phi: 1.6180339887;
+      --font-serif: 'Cormorant Garamond', Georgia, serif;
+      --font-sans: 'Inter', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; background-color: var(--bg-obsidian); color: var(--text-main); font-family: var(--font-sans); }
+    body {
+      background-color: var(--bg-obsidian);
+      background-image:
+        radial-gradient(circle at 12% 15%, rgba(212, 175, 55, 0.07) 0%, transparent 40%),
+        radial-gradient(circle at 88% 82%, rgba(56, 189, 248, 0.06) 0%, transparent 40%),
+        linear-gradient(rgba(212, 175, 55, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(212, 175, 55, 0.025) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 34px 34px, 34px 34px;
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-obsidian); }
+    ::-webkit-scrollbar-thumb { background: #263044; border-radius: 4px; border: 1px solid var(--gold-muted); }
+    ::-webkit-scrollbar-thumb:hover { background: var(--gold-primary); }
+
+    header.top-nav {
+      position: sticky; top: 0; z-index: 1000;
+      background: rgba(8, 10, 15, 0.90); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--gold-muted);
+      padding: 0 21px; height: 68px;
+      display: flex; align-items: center; justify-content: space-between; gap: 13px;
+    }
+    .brand-logo { display: flex; align-items: center; gap: 13px; text-decoration: none; color: var(--text-main); }
+    .phi-badge {
+      width: 40px; height: 40px; border-radius: 8px;
+      background: linear-gradient(135deg, rgba(212,175,55,0.22), rgba(212,175,55,0.05));
+      border: 1px solid var(--gold-primary);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-serif); font-size: 24px; font-weight: 700; color: var(--gold-primary);
+      box-shadow: 0 0 15px rgba(212,175,55,0.2);
+    }
+    .brand-title { font-family: var(--font-serif); font-size: 20px; font-weight: 700; letter-spacing: 0.03em; }
+    .brand-sub { font-family: var(--font-mono); font-size: 10px; color: var(--gold-primary); display: block; letter-spacing: 0.08em; }
+    .nav-links { display: flex; align-items: center; gap: 5px; overflow-x: auto; padding: 4px 0; max-width: 68vw; }
+    .nav-btn {
+      background: transparent; border: 1px solid transparent; color: var(--text-secondary);
+      font-family: var(--font-sans); font-size: 12px; font-weight: 500;
+      padding: 6px 11px; border-radius: 6px; cursor: pointer; white-space: nowrap; transition: all 0.2s ease;
+    }
+    .nav-btn:hover { color: var(--text-main); background: rgba(255,255,255,0.04); border-color: rgba(212,175,55,0.2); }
+    .nav-btn.active { color: var(--gold-bright); background: rgba(212,175,55,0.14); border-color: var(--gold-primary); }
+    .github-export-btn {
+      background: linear-gradient(135deg, #d4af37 0%, #b5891c 100%);
+      color: #080a0f; font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+      padding: 8px 13px; border-radius: 6px; border: none; cursor: pointer;
+      display: flex; align-items: center; gap: 7px; white-space: nowrap;
+      box-shadow: 0 4px 15px rgba(212,175,55,0.25); transition: transform 0.15s ease;
+    }
+    .github-export-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(212,175,55,0.4); }
+
+    .app-container { max-width: 1440px; margin: 0 auto; padding: 26px 21px 89px; }
+
+    .hero-banner {
+      background: linear-gradient(135deg, rgba(20, 26, 38, 0.92) 0%, rgba(11, 15, 23, 0.96) 100%);
+      border: 1px solid var(--gold-muted); border-radius: 13px;
+      padding: 28px 34px; margin-bottom: 34px; position: relative; overflow: hidden;
+      display: grid; grid-template-columns: 1.618fr 1fr; gap: 34px; align-items: center;
+    }
+    @media (max-width: 1024px) { .hero-banner { grid-template-columns: 1fr; padding: 21px; } }
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--gold-primary); background: rgba(212,175,55,0.1); border: 1px solid var(--gold-muted);
+      padding: 4px 10px; border-radius: 4px; margin-bottom: 13px;
+    }
+    .hero-h1 { font-family: var(--font-serif); font-size: clamp(28px, 3.5vw, 44px); font-weight: 600; line-height: 1.12; margin-bottom: 13px; color: var(--text-main); }
+    .hero-h1 span { color: var(--gold-primary); font-style: italic; }
+    .hero-desc { color: var(--text-secondary); font-size: 14.5px; margin-bottom: 21px; max-width: 68ch; }
+    .formula-bar { display: flex; flex-wrap: wrap; gap: 10px; }
+    .formula-pill {
+      background: rgba(8, 10, 15, 0.75); border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 7px 12px; border-radius: 6px; font-family: var(--font-mono); font-size: 11.5px; color: var(--cyan-sci);
+    }
+    .hero-epistemic-box {
+      background: rgba(8, 10, 15, 0.82); border: 1px solid rgba(255,255,255,0.08);
+      border-left: 3px solid var(--gold-primary); border-radius: 8px; padding: 18px;
+    }
+    .epistemic-title { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gold-primary); margin-bottom: 8px; }
+    .epistemic-eq {
+      font-family: var(--font-mono); font-size: 12px; background: rgba(212,175,55,0.08);
+      padding: 9px; border-radius: 6px; color: var(--gold-bright); margin: 8px 0; text-align: center; border: 1px dashed var(--gold-muted);
+    }
+
+    .golden-split { display: grid; grid-template-columns: 1.618fr 1fr; gap: 21px; align-items: start; }
+    @media (max-width: 1100px) { .golden-split { grid-template-columns: 1fr; } }
+
+    .section-block { margin-bottom: 55px; scroll-margin-top: 84px; }
+    .section-header {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      margin-bottom: 21px; padding-bottom: 13px; border-bottom: 1px solid rgba(212,175,55,0.25);
+      flex-wrap: wrap; gap: 13px;
+    }
+    .section-num { font-family: var(--font-mono); font-size: 12px; color: var(--gold-primary); letter-spacing: 0.12em; text-transform: uppercase; display: block; margin-bottom: 4px; }
+    .section-title { font-family: var(--font-serif); font-size: clamp(24px, 2.8vw, 34px); font-weight: 600; color: var(--text-main); line-height: 1.15; }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono);
+      font-size: 11px; font-weight: 500; padding: 4px 10px; border-radius: 99px; letter-spacing: 0.03em;
+    }
+    .badge-high { background: rgba(16, 185, 129, 0.12); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.35); }
+    .badge-med { background: rgba(245, 158, 11, 0.12); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.35); }
+    .badge-myth { background: rgba(244, 63, 94, 0.12); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.35); }
+    .badge-info { background: rgba(56, 189, 248, 0.12); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.35); }
+
+    .lab-card {
+      background: var(--bg-card); backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 13px;
+      padding: 21px; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4); position: relative;
+    }
+    .lab-card.gold-border { border-color: var(--gold-muted); }
+    .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 10px; flex-wrap: wrap; }
+    .card-title { font-family: var(--font-serif); font-size: 21px; font-weight: 600; color: var(--gold-bright); display: flex; align-items: center; gap: 8px; }
+
+    .tab-bar {
+      display: flex; gap: 8px; background: rgba(8, 10, 15, 0.65); padding: 6px;
+      border-radius: 8px; border: 1px solid rgba(255,255,255,0.06); margin-bottom: 21px; flex-wrap: wrap;
+    }
+    .tab-item {
+      flex: 1; min-width: 140px; padding: 9px 13px; border-radius: 6px; border: 1px solid transparent;
+      background: transparent; color: var(--text-secondary); font-family: var(--font-sans);
+      font-size: 12.5px; font-weight: 600; cursor: pointer; text-align: center; transition: all 0.2s;
+    }
+    .tab-item:hover { color: var(--text-main); background: rgba(255,255,255,0.03); }
+    .tab-item.active { background: rgba(212, 175, 55, 0.16); color: var(--gold-bright); border-color: var(--gold-primary); }
+
+    .canvas-stage {
+      width: 100%; background: #05070b; border: 1px solid rgba(212, 175, 55, 0.3);
+      border-radius: 8px; position: relative; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .stage-overlay-label {
+      position: absolute; top: 10px; left: 10px; background: rgba(8, 10, 15, 0.85);
+      border: 1px solid rgba(212, 175, 55, 0.35); padding: 4px 9px; border-radius: 4px;
+      font-family: var(--font-mono); font-size: 11px; color: var(--gold-bright); pointer-events: none; z-index: 10;
+    }
+    .stage-overlay-br {
+      position: absolute; bottom: 10px; right: 10px; background: rgba(8, 10, 15, 0.85);
+      border: 1px solid rgba(56, 189, 248, 0.35); padding: 4px 9px; border-radius: 4px;
+      font-family: var(--font-mono); font-size: 11px; color: var(--cyan-sci); pointer-events: none; z-index: 10;
+    }
+
+    .controls-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(175px, 1fr)); gap: 12px; margin-top: 16px; }
+    .control-group {
+      background: rgba(8, 10, 15, 0.55); border: 1px solid rgba(255,255,255,0.06);
+      padding: 10px 12px; border-radius: 8px;
+    }
+    .control-label {
+      display: flex; justify-content: space-between; font-family: var(--font-mono);
+      font-size: 11px; color: var(--text-secondary); margin-bottom: 6px;
+    }
+    .control-label span.val { color: var(--gold-primary); font-weight: 600; }
+    input[type="range"] { width: 100%; accent-color: var(--gold-primary); cursor: pointer; }
+    input[type="text"], input[type="number"], select, textarea {
+      width: 100%; background: #080a0f; border: 1px solid rgba(212, 175, 55, 0.35);
+      color: var(--text-main); font-family: var(--font-mono); font-size: 12.5px;
+      padding: 8px 11px; border-radius: 6px; outline: none;
+    }
+    input[type="text"]:focus, select:focus, textarea:focus { border-color: var(--gold-primary); box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.15); }
+
+    .btn-action {
+      background: rgba(212, 175, 55, 0.15); border: 1px solid var(--gold-primary); color: var(--gold-bright);
+      font-family: var(--font-mono); font-size: 11.5px; font-weight: 500; padding: 8px 13px;
+      border-radius: 6px; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .btn-action:hover { background: var(--gold-primary); color: #080a0f; }
+    .btn-action.cyan { background: rgba(56, 189, 248, 0.12); border-color: var(--cyan-sci); color: var(--cyan-sci); }
+    .btn-action.cyan:hover { background: var(--cyan-sci); color: #080a0f; }
+    .btn-action.emerald { background: rgba(16, 185, 129, 0.14); border-color: var(--emerald-ok); color: #34d399; }
+    .btn-action.emerald:hover { background: var(--emerald-ok); color: #080a0f; }
+
+    .metrics-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(125px, 1fr)); gap: 10px; margin-top: 13px; }
+    .metric-box {
+      background: rgba(8, 10, 15, 0.72); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 8px; padding: 9px 11px;
+    }
+    .metric-box .m-label { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); text-transform: uppercase; display: block; }
+    .metric-box .m-val { font-family: var(--font-mono); font-size: 15px; font-weight: 600; color: var(--text-main); margin-top: 2px; }
+    .metric-box .m-sub { font-family: var(--font-mono); font-size: 10px; color: var(--gold-primary); }
+
+    .doc-example-list { display: flex; flex-direction: column; gap: 13px; }
+    .doc-card {
+      background: rgba(12, 16, 24, 0.88); border: 1px solid rgba(255,255,255,0.07);
+      border-left: 3px solid var(--gold-primary); border-radius: 8px; padding: 14px 16px; transition: border-color 0.2s;
+    }
+    .doc-card.myth-card { border-left-color: var(--crimson-myth); }
+    .doc-card.sci-card { border-left-color: var(--emerald-ok); }
+    .doc-card-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
+    .doc-card-title { font-family: var(--font-serif); font-size: 17.5px; font-weight: 600; color: var(--text-main); }
+    .doc-card-body { font-size: 13px; color: var(--text-secondary); line-height: 1.55; }
+    .doc-cite {
+      font-family: var(--font-mono); font-size: 10.5px; color: var(--gold-primary);
+      margin-top: 8px; padding-top: 6px; border-top: 1px dashed rgba(255,255,255,0.08);
+      display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px;
+    }
+
+    .data-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
+    .data-table th {
+      text-align: left; font-family: var(--font-mono); font-size: 10.5px; text-transform: uppercase;
+      color: var(--gold-primary); padding: 7px 9px; border-bottom: 1px solid var(--gold-muted); background: rgba(212,175,55,0.06);
+    }
+    .data-table td { padding: 7px 9px; border-bottom: 1px solid rgba(255,255,255,0.05); font-family: var(--font-mono); color: var(--text-secondary); }
+    .data-table tr:hover td { background: rgba(255,255,255,0.02); color: var(--text-main); }
+
+    .verdict-banner {
+      margin-top: 13px; padding: 12px 15px; border-radius: 8px;
+      background: rgba(16, 185, 129, 0.09); border: 1px solid rgba(16, 185, 129, 0.35);
+      font-size: 12.5px; color: var(--text-main);
+    }
+    .verdict-banner.warn { background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.4); }
+
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(0, 0, 0, 0.84); backdrop-filter: blur(8px);
+      z-index: 2000; display: none; align-items: center; justify-content: center; padding: 21px;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-window {
+      background: var(--bg-slate); border: 1px solid var(--gold-primary); border-radius: 13px;
+      max-width: 890px; width: 100%; max-height: 88vh; overflow-y: auto; padding: 28px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.75);
+    }
+    .code-pre {
+      background: #05070b; border: 1px solid rgba(255,255,255,0.1); padding: 13px;
+      border-radius: 8px; font-family: var(--font-mono); font-size: 11.5px; color: var(--cyan-sci);
+      overflow-x: auto; margin: 10px 0; white-space: pre-wrap;
+    }
+
+    .synth-keys { display: grid; grid-template-columns: repeat(auto-fit, minmax(76px, 1fr)); gap: 7px; margin-top: 13px; }
+    .synth-key {
+      background: linear-gradient(180deg, #192231 0%, #0d121b 100%);
+      border: 1px solid rgba(212, 175, 55, 0.35); border-radius: 6px; padding: 10px 6px;
+      text-align: center; cursor: pointer; transition: all 0.12s; user-select: none;
+    }
+    .synth-key:hover, .synth-key.playing {
+      background: linear-gradient(180deg, rgba(212,175,55,0.35) 0%, rgba(212,175,55,0.1) 100%);
+      border-color: var(--gold-bright); transform: translateY(2px);
+    }
+    .synth-key .k-step { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); display: block; }
+    .synth-key .k-freq { font-family: var(--font-mono); font-size: 12.5px; font-weight: 600; color: var(--gold-bright); margin: 3px 0; display: block; }
+    .synth-key .k-cent { font-family: var(--font-mono); font-size: 10px; color: var(--cyan-sci); display: block; }
+  </style>
+</head>
+<body>
+
+  <!-- TOP NAVIGATION -->
+  <header class="top-nav">
+    <a href="#top" class="brand-logo">
+      <div class="phi-badge">φ</div>
+      <div>
+        <span class="brand-title">PHI-LAB // AURUM v2.0</span>
+        <span class="brand-sub">CRISTALLOGRAFIA 3D • SOBEL ANTI-BIAS • BIOMECCANICA • MODALITÀ A CLAUDE</span>
+      </div>
+    </a>
+    <nav class="nav-links">
+      <button class="nav-btn active" onclick="scrollToSec('sec-transformer')">00. Trasformatore (Sobel & 3D)</button>
+      <button class="nav-btn" onclick="scrollToSec('sec-math')">01. Cassini & Medie Metalliche</button>
+      <button class="nav-btn" onclick="scrollToSec('sec-quantum')">02. Fisica E8 & KAM</button>
+      <button class="nav-btn" onclick="scrollToSec('sec-bio')">03. Fillotassi, Lucas & Nautilus</button>
+      <button class="nav-btn" onclick="scrollToSec('sec-eng')">04. Ingegneria & GSS</button>
+      <button class="nav-btn" onclick="scrollToSec('sec-arch')">05. Architettura, Religioni & Africa</button>
+      <button class="nav-btn" onclick="scrollToSec('sec-design')">06. Design & Musica (4 Livelli)</button>
+      <button class="nav-btn" onclick="scrollToSec('sec-tango')">07. Biomeccanica Tango 3D & Finanza</button>
+    </nav>
+    <button class="github-export-btn" onclick="openGithubModal()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+      </svg>
+      Claude App (Modalità A)
+    </button>
+  </header>
+
+  <main class="app-container" id="top">
+
+    <!-- HERO -->
+    <section class="hero-banner">
+      <div>
+        <div class="hero-tag">Edizione Integrale Debuggata • Vera Cristallografia 3D • Filtro di Sobel • Biomeccanica 3D</div>
+        <h1 class="hero-h1">Laboratorio Universale della <span>Sezione Aurea</span> e Verifica Empirica Anti-Mito</h1>
+        <p class="hero-desc">
+          Trasforma qualsiasi <strong>immagine</strong> (con rilevamento automatico dei bordi di Sobel sul buffer pixel pulito e auto-crop sul soggetto), <strong>struttura cristallografica o formula chimica</strong> (Fullerene C<sub>60</sub>, Icosaedri, Quasicristalli, file <code>.xyz</code>) e <strong>serie numerica</strong> secondo $\varphi = \frac{1+\sqrt{5}}{2}$, confrontandoli sistematicamente con ipotesi nulle ($\sqrt{2}$, Terzi, Serie di Lucas) e modelli 3D WebGL dotati di <em>GPU Memory Disposal</em>.
+        </p>
+        <div class="formula-bar">
+          <div class="formula-pill">φ = (1 + √5)/2 ≈ 1.6180339887</div>
+          <div class="formula-pill">Cassini: F<sub>n+1</sub>F<sub>n-1</sub> - F<sub>n</sub>² = (-1)<sup>n</sup></div>
+          <div class="formula-pill">Angolo Aureo: 137.507764° | Lucas: 99.501°</div>
+          <div class="formula-pill">C₆₀ Vertici: (0, ±1, ±3φ)</div>
+        </div>
+      </div>
+      <div class="hero-epistemic-box">
+        <div class="epistemic-title">Protocollo "Avvocato del Diavolo" & Debug v2.0</div>
+        <div class="epistemic-eq">φ = Modello Generativo + Test contro Ipotesi Nulle − Mito Estetico</div>
+        <p style="font-size: 12.5px; color: var(--text-secondary);">
+          <strong>Architettura v2.0:</strong> Buffer offscreen separato per il calcolo di salienza di Sobel, pulizia VRAM (<code>geometry.dispose()</code>), <code>IntersectionObserver</code> per mettere in pausa i canvas 3D fuori schermo e supporto nativo per <strong>Claude GitHub App (Modalità A)</strong> senza chiavi API.
+        </p>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         SEZIONE 00: TRASFORMATORE UNIVERSALE AUREO (SOBEL + VERA CHIMICA 3D)
+         ===================================================================== -->
+    <section class="section-block" id="sec-transformer">
+      <div class="section-header">
+        <div>
+          <span class="section-num">Sezione 00 // Motore Centrale Operativo (Bug-Free v2.0)</span>
+          <h2 class="section-title">Trasformatore Universale Aureo: Immagini (Sobel), Cristallografia 3D & Dati</h2>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <span class="badge badge-high">Sobel Clean-Buffer Active</span>
+          <span class="badge badge-info">WebGL GPU Memory Managed</span>
+        </div>
+      </div>
+
+      <div class="tab-bar">
+        <button class="tab-item active" id="tab-btn-img" onclick="switchTransTab('img')">
+          🖼️ Modulo A: Immagini + Auto-Fit di Sobel & Smart Auto-Crop
+        </button>
+        <button class="tab-item" id="tab-btn-chem" onclick="switchTransTab('chem')">
+          ⚛️ Modulo B: Vera Geometria Molecolare/Cristallografica 3D (.XYZ) & Formule
+        </button>
+      </div>
+
+      <!-- MODULO A: IMMAGINI + SOBEL -->
+      <div id="trans-panel-img" class="golden-split">
+        <div class="lab-card gold-border">
+          <div class="card-header">
+            <div class="card-title">Canvas Biometrico & Rilevatore di Salienza di Sobel (Pixel Buffer Pulito)</div>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <label class="btn-action" style="cursor:pointer;">
+                📂 Carica Immagine
+                <input type="file" id="img-upload-input" accept="image/*" style="display:none;" onchange="handleUserImage(event)">
+              </label>
+              <button class="btn-action emerald" onclick="runSobelAutoFit()">🎯 Auto-Fit & Verdetto Anti-Bias (Sobel)</button>
+              <button class="btn-action cyan" onclick="downloadTransformedImage()">💾 Scarica PNG</button>
+            </div>
+          </div>
+
+          <div class="canvas-stage" style="min-height: 430px; padding: 10px;">
+            <span class="stage-overlay-label" id="img-stage-label">Rapporto Attivo: 1 : 1.618 (Sezione Aurea)</span>
+            <canvas id="img-transformer-canvas" width="800" height="494" style="max-width:100%; height:auto; border-radius:4px;"></canvas>
+            <span class="stage-overlay-br" id="img-stage-dim">800 × 494 px</span>
+          </div>
+
+          <!-- VERDETTO AUTOMATICO SOBEL -->
+          <div class="verdict-banner" id="sobel-verdict-box">
+            <strong>Verdetto Algoritmo Anti-Bias (Sobel):</strong> Premi <em>"Auto-Fit & Verdetto Anti-Bias (Sobel)"</em> per scansionare i gradienti di luminanza sul buffer pixel pulito, testare tutte le 4 orientazioni della spirale contro Griglia Aurea ($1.618$), Regola dei Terzi ($1.500$) e Rapporto $\sqrt{2}$ ($1.414$, TU Delft) e calcolare il baricentro focale $(x_c, y_c)$.
+          </div>
+
+          <div class="controls-grid">
+            <div class="control-group">
+              <div class="control-label"><span>Modalità Proporzione</span></div>
+              <select id="img-mode-select" onchange="renderImgCanvas()">
+                <option value="crop-phi">Ritaglio Aureo Centrato (1 : φ)</option>
+                <option value="smart-crop-sobel">Smart Auto-Crop sul Soggetto (Sobel → Nodo φ)</option>
+                <option value="stretch-phi">Riscalatura Anamorfica Aurea (W = H × φ)</option>
+                <option value="fib-mosaic">Mosaico Frattale di Fibonacci (Scomposizione)</option>
+                <option value="original">Formato Originale + Griglie Comparative</option>
+              </select>
+            </div>
+
+            <div class="control-group">
+              <div class="control-label"><span>Archetipo / Preset</span></div>
+              <select id="img-preset-select" onchange="loadPresetImage(this.value)">
+                <option value="sunflower">Capolino di Girasole (Fillotassi 34/55)</option>
+                <option value="parthenon">Facciata Partenone (Test Anti-Mito 4:9)</option>
+                <option value="nautilus">Sezione Nautilus (Verifica 1.31 vs 1.618)</option>
+                <option value="portrait">Ritratto Editoriale Decentratura Focale</option>
+              </select>
+            </div>
+
+            <div class="control-group">
+              <div class="control-label"><span>Quadrante Spirale Aurea</span><span class="val" id="rot-val-lbl">Q1 (Alto-Sx)</span></div>
+              <select id="img-spiral-rot" onchange="renderImgCanvas()">
+                <option value="0">Quadrante 1 (Origine Alto-Sinistra)</option>
+                <option value="1">Quadrante 2 (Origine Alto-Destra)</option>
+                <option value="2">Quadrante 3 (Origine Basso-Destra)</option>
+                <option value="3">Quadrante 4 (Origine Basso-Sinistra)</option>
+              </select>
+            </div>
+
+            <div class="control-group">
+              <div class="control-label"><span>Livelli Sovrapposti & Heatmap</span></div>
+              <div style="display:flex; flex-direction:column; gap:4px; font-size:11.5px; color:var(--text-secondary);">
+                <label><input type="checkbox" id="chk-spiral" checked onchange="renderImgCanvas()"> Spirale & Griglia φ (Oro)</label>
+                <label><input type="checkbox" id="chk-thirds" onchange="renderImgCanvas()"> Regola dei Terzi 1:2 (Ciano)</label>
+                <label><input type="checkbox" id="chk-sqrt2" onchange="renderImgCanvas()"> Griglia √2 = 1.414 (Rosa)</label>
+                <label><input type="checkbox" id="chk-sobel-map" onchange="renderImgCanvas()"> Mostra Mappa Salienza Sobel</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="metrics-row">
+            <div class="metric-box">
+              <span class="m-label">Rapporto (W/H)</span>
+              <div class="m-val" id="m-img-orig-ratio">1.618</div>
+              <span class="m-sub" id="m-img-orig-err">Scarto da φ: 0.00%</span>
+            </div>
+            <div class="metric-box">
+              <span class="m-label">Salienza Nodi φ (61.8%)</span>
+              <div class="m-val" id="m-img-phi-score">--</div>
+              <span class="m-sub">Buffer pixel pulito</span>
+            </div>
+            <div class="metric-box">
+              <span class="m-label">Salienza Terzi (33.3%)</span>
+              <div class="m-val" id="m-img-thirds-score">--</div>
+              <span class="m-sub">Ipotesi nulla 1:2</span>
+            </div>
+            <div class="metric-box">
+              <span class="m-label">Salienza √2 (TU Delft)</span>
+              <div class="m-val" id="m-img-sqrt2-score">--</div>
+              <span class="m-sub">Ipotesi ISO 1.414</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="doc-example-list">
+          <div class="lab-card">
+            <div class="card-header">
+              <div class="card-title">Casi Studio Fotografia, Visione & Bias</div>
+              <span class="badge badge-med">Validazione Empirica</span>
+            </div>
+            <div class="doc-example-list">
+              <div class="doc-card sci-card">
+                <div class="doc-card-head">
+                  <span class="doc-card-title">1. Perché il Filtro di Sobel Smaschera il Bias di Conferma</span>
+                  <span class="badge badge-high">Zero Inquinamento Pixel</span>
+                </div>
+                <p class="doc-card-body">
+                  Come documentato da George Markowsky e dagli studi di estetica sperimentale (Fechner, McManus, Höge), sovrapporre una griglia aurea a posteriori induce una fallacia di accomodamento visivo. Il nostro algoritmo calcola il gradiente di Sobel $G = \sqrt{G_x^2 + G_y^2}$ su un <code>offscreenCanvas</code> <strong>prima</strong> di tracciare le linee e misura oggettivamente se i picchi di contrasto cadono sui nodi di $\varphi$ ($0.618$), dei Terzi ($0.333$) o di $\sqrt{2}$ ($0.414$).
+                </p>
+                <div class="doc-cite">
+                  <span>Fonte: Markowsky / Springer (2018) / TU Delft</span>
+                  <span>Metodo: Sobel Gradient Saliency</span>
+                </div>
+              </div>
+
+              <div class="doc-card">
+                <div class="doc-card-head">
+                  <span class="doc-card-title">2. Smart Auto-Crop: Riallineare il Baricentro sul Nodo Aureo</span>
+                  <span class="badge badge-info">Algoritmo Generativo</span>
+                </div>
+                <p class="doc-card-body">
+                  Selezionando <em>"Smart Auto-Crop sul Soggetto (Sobel → Nodo φ)"</em>, l'applicazione individua il centro di massa energetico $(x_c, y_c)$ dell'immagine e trasla la finestra di ritaglio $1:\varphi$ affinché il soggetto principale cada esattamente sull'intersezione aurea ($61.8\%, 38.2\%$).
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODULO B: VERA GEOMETRIA MOLECOLARE & CRISTALLOGRAFICA 3D + FORMULE -->
+      <div id="trans-panel-chem" class="golden-split" style="display:none;">
+        <div class="lab-card gold-border">
+          <div class="card-header">
+            <div class="card-title">Generatore Cristallografico 3D (.XYZ), Fullerene C₆₀ & Parser Stechiometrico</div>
+            <span class="badge badge-high">Coordinate Auree Esatte 3D</span>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr auto; gap:10px; margin-bottom:12px;">
+            <input type="text" id="chem-data-input" value="C60" placeholder="Es: C60, CoNb2O6, ICOSAHEDRON, GIRIH, Ca(OH)2, oppure serie numerica">
+            <button class="btn-action" onclick="processUniversalInput()">⚡ Elabora in 3D & 2D</button>
+          </div>
+
+          <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px;">
+            <button class="btn-action cyan" style="font-size:11px; padding:5px 9px;" onclick="setQuickInput('C60')">⚽ Fullerene C₆₀ (Coordinate φ Reali)</button>
+            <button class="btn-action cyan" style="font-size:11px; padding:5px 9px;" onclick="setQuickInput('ICOSAHEDRON')">💎 Icosaedro Platonico (0, ±1, ±φ)</button>
+            <button class="btn-action cyan" style="font-size:11px; padding:5px 9px;" onclick="setQuickInput('CoNb2O6')">🧲 Catena Spin CoNb₂O₆ (E8)</button>
+            <button class="btn-action cyan" style="font-size:11px; padding:5px 9px;" onclick="setQuickInput('Ca(OH)2')">🧪 Parentesi: Ca(OH)₂</button>
+            <button class="btn-action cyan" style="font-size:11px; padding:5px 9px;" onclick="setQuickInput('4, 6, 10, 16, 27, 43, 70, 113, 183')">📏 Modulor Serie Rossa</button>
+          </div>
+
+          <!-- SOTTOTAB: INPUT .XYZ PERSONALIZZATO -->
+          <details style="margin-bottom:12px; background:rgba(8,10,15,0.65); border:1px solid rgba(255,255,255,0.08); border-radius:6px; padding:8px 12px;">
+            <summary style="cursor:pointer; font-family:var(--font-mono); font-size:11.5px; color:var(--gold-primary);">
+              🔬 Incolla Coordinate Molecolari 3D (.XYZ) per Misurazione Reale Distanze e Angoli di Legame (108° / φ)
+            </summary>
+            <div style="margin-top:8px;">
+              <textarea id="xyz-custom-input" rows="5" placeholder="Formato XYZ: Simbolo X Y Z per riga">C 0.000 1.000 4.854
+C 0.000 -1.000 4.854
+C 1.618 2.000 4.236
+C -1.618 2.000 4.236
+C 1.000 3.618 3.236</textarea>
+              <button class="btn-action emerald" style="margin-top:6px;" onclick="parseCustomXYZ()">Analizza Geometria .XYZ Reale</button>
+            </div>
+          </details>
+
+          <div style="display:grid; grid-template-columns: 1.25fr 1fr; gap:13px;">
+            <div class="canvas-stage" style="height: 370px;" id="chem3d-container">
+              <span class="stage-overlay-label" id="chem3d-title-lbl">3D WebGL: Fullerene C₆₀ (Icosaedro Troncato)</span>
+              <span class="stage-overlay-br">Trascina per ruotare • GPU Managed</span>
+            </div>
+            <div class="canvas-stage" style="height: 370px; flex-direction:column; padding:8px;">
+              <span class="stage-overlay-label">Spettro Angolare & Rapporti Interatomici / Φ</span>
+              <canvas id="chem2d-canvas" width="320" height="320" style="max-width:100%; height:auto;"></canvas>
+            </div>
+          </div>
+
+          <div class="verdict-banner" id="chem-verdict-banner">
+            <!-- Popolato da JS -->
+          </div>
+
+          <div style="margin-top:16px; overflow-x:auto;">
+            <table class="data-table" id="universal-data-table">
+              <thead>
+                <tr>
+                  <th>Elemento / Vertice</th>
+                  <th>Valore / Coord (x,y,z)</th>
+                  <th>Peso / Distanza Legame</th>
+                  <th>Rapporto Osservato vs φ</th>
+                  <th>Angolo Caratteristico</th>
+                  <th>Validazione Fisica</th>
+                </tr>
+              </thead>
+              <tbody id="universal-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="doc-example-list">
+          <div class="lab-card">
+            <div class="card-header">
+              <div class="card-title">Vera Chimica Aurea vs Numerologia Atomica</div>
+              <span class="badge badge-high">Rigore Fisico</span>
+            </div>
+            <div class="doc-example-list">
+              <div class="doc-card sci-card">
+                <div class="doc-card-head">
+                  <span class="doc-card-title">1. Fullerene C₆₀ e Quasicristalli Icosaedrici</span>
+                  <span class="badge badge-high">Geometria 3D Esatta</span>
+                </div>
+                <p class="doc-card-body">
+                  La sezione aurea in chimica non risiede nei rapporti casuali tra numeri atomici $Z$, ma nelle <strong>coordinate cartesiane 3D</strong> delle molecole a simmetria icosaedrica ($I_h$). Nel Fullerene $\text{C}_{60}$, i 60 atomi di carbonio giacciono esattamente sulle permutazioni pari di $(0, \pm 1, \pm 3\varphi)$, $(\pm 1, \pm(2+\varphi), \pm 2\varphi)$ e $(\pm \varphi, \pm 2, \pm(2\varphi+1))$, con pentagoni regolari i cui angoli interni di $108^\circ$ soddisfano $\cos(36^\circ) = \varphi/2$ e diagonale/lato $= \varphi$.
+                </p>
+                <div class="doc-cite">
+                  <span>Fonte: Pacioli (Poliedri) / Shechtman / Quasicristalli</span>
+                  <span>Gruppo Puntuale: I_h (Icosaedrico)</span>
+                </div>
+              </div>
+
+              <div class="doc-card sci-card">
+                <div class="doc-card-head">
+                  <span class="doc-card-title">2. Niobato di Cobalto (CoNb₂O₆) e Simmetria E₈</span>
+                  <span class="badge badge-high">Science (Coldea et al., 2010)</span>
+                </div>
+                <p class="doc-card-body">
+                  Nel cristallo magnetico $\text{CoNb}_2\text{O}_6$ portato vicino allo zero assoluto sotto campo magnetico trasversale critico, il rapporto misurato tra le energie delle prime due quasiparticelle eccitate è $E_2/E_1 = 1.618$, firma sperimentale dell'algebra di Lie $E_8$ a 248 dimensioni.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         SEZIONE 01: IDENTITÀ DI CASSINI, SOMME DI FIBONACCI E MEDIE METALLICHE
+         ===================================================================== -->
+    <section class="section-block" id="sec-math">
+      <div class="section-header">
+        <div>
+          <span class="section-num">Sezione 01 // Fondamenti Algebrici Integrati (Pingala, Binet, Cassini, Spinadel)</span>
+          <h2 class="section-title">Identità di Cassini, Somme di Fibonacci & Famiglia delle Medie Metalliche</h2>
+        </div>
+        <span class="badge badge-high">Evidenza: Dimostrazione Algebrica Esatta</span>
+      </div>
+
+      <div class="golden-split">
+        <div class="lab-card gold-border">
+          <div class="card-header">
+            <div class="card-title">Verificatore Algebrico Interattivo: Binet, Identità di Cassini & Medie Metalliche</div>
+            <span class="badge badge-info">x² − n·x − 1 = 0</span>
+          </div>
+
+          <div class="controls-grid" style="margin-top:0; margin-bottom:14px;">
+            <div class="control-group">
+              <div class="control-label"><span>Indice di Fibonacci (n)</span><span class="val" id="cassini-n-lbl">n = 8 (F₈ = 21)</span></div>
+              <input type="range" id="cassini-n-slider" min="2" max="20" step="1" value="8" oninput="updateMathSection()">
+            </div>
+            <div class="control-group">
+              <div class="control-label"><span>Parametro Media Metallica (k)</span><span class="val" id="metallic-k-lbl">k = 1 (Aurea φ)</span></div>
+              <input type="range" id="metallic-k-slider" min="1" max="5" step="1" value="1" oninput="updateMathSection()">
+            </div>
+          </div>
+
+          <div class="canvas-stage" style="height:260px; padding:10px;">
+            <span class="stage-overlay-label" id="math-canvas-lbl">Convergenza Razionale F(n+1)/F(n) → φ e Paradossi Area di Cassini (-1)ⁿ</span>
+            <canvas id="math-cassini-canvas" width="720" height="240" style="max-width:100%; height:auto;"></canvas>
+          </div>
+
+          <div class="metrics-row">
+            <div class="metric-box">
+              <span class="m-label">Identità di Cassini</span>
+              <div class="m-val" id="m-cassini-eq">34×13 − 21² = +1</div>
+              <span class="m-sub">Fₙ₊₁Fₙ₋₁ − Fₙ² = (−1)ⁿ</span>
+            </div>
+            <div class="metric-box">
+              <span class="m-label">Somma Lineare ΣFᵢ</span>
+              <div class="m-val" id="m-sum-lin">54 = F₁₀ − 1</div>
+              <span class="m-sub">Σᵢ₌₀ⁿ Fᵢ = Fₙ₊₂ − 1</span>
+            </div>
+            <div class="metric-box">
+              <span class="m-label">Somma Quadrati ΣFᵢ²</span>
+              <div class="m-val" id="m-sum-sq">714 = 21 × 34</div>
+              <span class="m-sub">Σᵢ₌₀ⁿ Fᵢ² = Fₙ · Fₙ₊₁</span>
+            </div>
+            <div class="metric-box">
+              <span class="m-label">Media Metallica σₖ</span>
+              <div class="m-val" id="m-metallic-val">1.618034</div>
+              <span class="m-sub" id="m-metallic-cf">[1; 1, 1, 1, ...]</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="doc-example-list">
+          <div class="doc-card sci-card">
+            <div class="doc-card-head">
+              <span class="doc-card-title">1. Prosodia Sanscrita: Sequenza di Hemachandra-Pingala (200 a.C.)</span>
+              <span class="badge badge-high">Storiografia Globale</span>
+            </div>
+            <p class="doc-card-body">
+              Prima del <em>Liber Abaci</em> di Fibonacci (1202), Acharya Pingala nel <em>Chandaḥśāstra</em> (200 a.C.), Virahanka (VII sec.) e Hemachandra (1150 d.C.) avevano già formalizzato la ricorsione $F_n = F_{n-1} + F_{n-2}$ per contare le combinazioni metriche di sillabe brevi (<em>laghu</em>, $1$) e lunghe (<em>guru</em>, $2$), costruendo il <em>Matra Meru</em> (Triangolo di Pascal).
+            </p>
+            <div class="doc-cite">
+              <span>Fonte: Rapporto Scientifico Sez. 1.1</span>
+              <span>Identità di Cassini: Sez. 3.4</span>
+            </div>
+          </div>
+
+          <div class="doc-card sci-card">
+            <div class="doc-card-head">
+              <span class="doc-card-title">2. Vera de Spinadel (1999) e Alexey Stakhov</span>
+              <span class="badge badge-high">Medie Metalliche</span>
+            </div>
+            <p class="doc-card-body">
+              Le soluzioni positive di $x^2 - kx - 1 = 0$ generano la Famiglia delle Medie Metalliche: Aurea ($k=1 \to 1.618$, frazione continua $[1;1,1\dots]$), Argento ($k=2 \to 2.414$, $[2;2,2\dots]$), Bronzo ($k=3 \to 3.302$, $[3;3,3\dots]$) e Rame ($k=4 \to 4.236$).
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         SEZIONE 02: FISICA QUANTISTICA E8 & TEOREMA KAM
+         ===================================================================== -->
+    <section class="section-block" id="sec-quantum">
+      <div class="section-header">
+        <div>
+          <span class="section-num">Sezione 02 // Fisica Teorica, Meccanica Celeste & Stato Solido</span>
+          <h2 class="section-title">Tori Invarianti KAM 3D & Catena Quantistica E₈ nel Niobato di Cobalto</h2>
+        </div>
+        <span class="badge badge-high">Evidenza Scientifica: Molto Alta</span>
+      </div>
+
+      <div class="golden-split">
+        <div class="lab-card gold-border">
+          <div class="card-header">
+            <div class="card-title">Simulatore 3D WebGL: Stabilità Orbitale sul Toro KAM ($\omega_1/\omega_2$)</div>
+            <span class="badge badge-info">Kolmogorov-Arnold-Moser</span>
+          </div>
+
+          <div class="canvas-stage" style="height: 360px;" id="kam3d-container">
+            <span class="stage-overlay-label" id="kam-status-lbl">Rapporto: ω₁/ω₂ = φ (Quasi-Periodico Stabile)</span>
+            <span class="stage-overlay-br">WebGL 3D Interattivo</span>
+          </div>
+
+          <div class="controls-grid">
+            <div class="control-group">
+              <div class="control-label"><span>Rapporto Frequenze (ω₁/ω₂)</span><span class="val" id="kam-ratio-val">1.618034 (φ)</span></div>
+              <select id="kam-preset-select" onchange="updateKamSimulation(this.value)">
+                <option value="1.6180339887">Sezione Aurea φ = 1.618034 (Massima Stabilità KAM)</option>
+                <option value="2.4142135623">Media d'Argento = 2.414214 (Quasi-Periodica)</option>
+                <option value="1.5">Risonanza Razionale 3:2 = 1.500 (Instabile / Caos)</option>
+                <option value="2.0">Risonanza Razionale 2:1 = 2.000 (Espulsione Orbitale)</option>
+              </select>
+            </div>
+            <div class="control-group">
+              <div class="control-label"><span>Perturbazione Gravitazionale (ε)</span><span class="val" id="kam-eps-val">0.12</span></div>
+              <input type="range" id="kam-eps-slider" min="0" max="0.6" step="0.02" value="0.12" oninput="updateKamPerturbation(this.value)">
+            </div>
+          </div>
+        </div>
+
+        <div class="doc-example-list">
+          <div class="doc-card sci-card">
+            <div class="doc-card-head">
+              <span class="doc-card-title">Teorema KAM: Perché φ Salva i Sistemi Planetari</span>
+              <span class="badge badge-high">Meccanica Celeste & CERN</span>
+            </div>
+            <p class="doc-card-body">
+              Poiché $\varphi = [1; 1, 1, 1, \dots]$ converge più lentamente di qualsiasi altro irrazionale, i tori invarianti nello spazio delle fasi con rapporto di frequenza $\varphi$ sono gli ultimi a distruggersi sotto perturbazioni gravitazionali (evitando le risonanze distruttive $2:1$ o $3:2$), garantendo la stabilità delle orbite planetarie e dei fasci nell'LHC del CERN.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         SEZIONE 03: BIOLOGIA, FILLOTASSI, SERIE DI LUCAS & NAUTILUS
+         ===================================================================== -->
+    <section class="section-block" id="sec-bio">
+      <div class="section-header">
+        <div>
+          <span class="section-num">Sezione 03 // Morfogenesi, Regola di Hofmeister, Serie di Lucas & Demistificazione</span>
+          <h2 class="section-title">Fillotassi Magnetica (Douady-Couder), Eccezioni di Lucas & Il Falso Mito del Nautilus</h2>
+        </div>
+        <span class="badge badge-high">Include Eccezioni Non-Fibonacci</span>
+      </div>
+
+      <div class="golden-split">
+        <div class="lab-card gold-border">
+          <div class="card-header">
+            <div class="card-title">Simulatore di Hofmeister / Douady-Couder vs Spirale Reale del Nautilus</div>
+            <div style="display:flex; gap:6px;">
+              <button class="btn-action" onclick="setBioMode('phyllotaxis')">🌻 Meristema & Lucas</button>
+              <button class="btn-action cyan" onclick="setBioMode('nautilus')">🐚 Test Nautilus (1.31 vs φ)</button>
+            </div>
+          </div>
+
+          <div class="canvas-stage" style="height: 390px;">
+            <span class="stage-overlay-label" id="bio-stage-lbl">Divergenza: 137.5077° (Parastichie 21 / 34)</span>
+            <canvas id="bio-sim-canvas" width="680" height="390" style="max-width:100%; height:auto;"></canvas>
+            <span class="stage-overlay-br" id="bio-stage-sub">Auto-organizzazione repulsiva</span>
+          </div>
+
+          <div class="controls-grid" id="bio-controls-phyllo">
+            <div class="control-group">
+              <div class="control-label"><span>Angolo Divergenza (α)</span><span class="val" id="bio-angle-lbl">137.508°</span></div>
+              <input type="range" id="bio-angle-slider" min="85" max="180" step="0.01" value="137.5077" oninput="updateBioPhyllo()">
+            </div>
+            <div class="control-group">
+              <div class="control-label"><span>Regime Morfogenetico (Incluso Lucas & Eccezioni)</span></div>
+              <select onchange="document.getElementById('bio-angle-slider').value=this.value; updateBioPhyllo();">
+                <option value="137.507764">Angolo Aureo 137.5077° → Fibonacci (1, 2, 3, 5, 8, 13, 21, 34)</option>
+                <option value="99.50155">Angolo di Lucas 99.501° → Serie di Lucas (2, 1, 3, 4, 7, 11, 18, 29)</option>
+                <option value="90.00">Pattern Decussato 90.00° (Foglie opposte a coppie: Menta/Basilico)</option>
+                <option value="180.00">Pattern Distico 180.00° (2 ranghi opposti: Graminacee)</option>
+                <option value="137.00">Deviazione 137.00° (Rottura in bracci spiraliformi)</option>
+              </select>
+            </div>
+            <div class="control-group">
+              <div class="control-label"><span>Numero Primordi (N)</span><span class="val" id="bio-count-lbl">320</span></div>
+              <input type="range" id="bio-count-slider" min="50" max="600" step="10" value="320" oninput="updateBioPhyllo()">
+            </div>
+          </div>
+        </div>
+
+        <div class="doc-example-list">
+          <div class="doc-card sci-card">
+            <div class="doc-card-head">
+              <span class="doc-card-title">1. Regola di Hofmeister, Auxine e Serie di Lucas</span>
+              <span class="badge badge-high">Appendice Parte IV</span>
+            </div>
+            <p class="doc-card-body">
+              Le piante non "calcolano" $\varphi$: ogni nuovo primordio emerge nella zona di minima inibizione biochimica (auxine) e tensione meccanica (Regola di Hofmeister). Variando le condizioni iniziali del meristema, lo stesso modello biomeccanico ricorsivo genera anche la <strong>Serie di Lucas</strong> ($2, 1, 3, 4, 7, 11, 18\dots$ con angolo $\approx 99.5^\circ$) o pattern decussati a $90^\circ$, smentendo che la fillotassi aurea sia una legge universale senza eccezioni.
+            </p>
+          </div>
+
+          <div class="doc-card myth-card">
+            <div class="doc-card-head">
+              <span class="doc-card-title">2. Demistificazione Biometrica del Nautilus (Bartlett)</span>
+              <span class="badge badge-myth">Falso Mito Accademico</span>
+            </div>
+            <p class="doc-card-body">
+              Su oltre 80 conchiglie di <em>Nautilus pompilius</em>, il fattore medio di espansione è $\approx 1.31$ (e $\approx 1.36$ nel <em>Crusty Nautilus</em>, vicino a $\chi$), molto lontano da $\varphi \approx 1.618$ per quarto di giro.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         SEZIONE 04: INGEGNERIA & GOLDEN SECTION SEARCH
+         ===================================================================== -->
+    <section class="section-block" id="sec-eng">
+      <div class="section-header">
+        <div>
+          <span class="section-num">Sezione 04 // Ottimizzazione Numerica, Informatica & Metamateriali</span>
+          <h2 class="section-title">Algoritmo Golden Section Search (GSS), Fibonacci Heap & Quasicristalli</h2>
+        </div>
+        <span class="badge badge-high">Evidenza: Algoritmica Solida</span>
+      </div>
+
+      <div class="golden-split">
+        <div class="lab-card gold-border">
+          <div class="card-header">
+            <div class="card-title">Esecutore Interattivo: Golden Section Search su $f(x)$</div>
+            <div style="display:flex; gap:6px;">
+              <button class="btn-action" onclick="stepGSS()">▶ Passo Successivo (1 Eval)</button>
+              <button class="btn-action cyan" onclick="resetGSS()">↺ Reset [0, 5]</button>
+            </div>
+          </div>
+
+          <div class="canvas-stage" style="height: 290px;">
+            <span class="stage-overlay-label" id="gss-iter-lbl">Iterazione: 0 | Intervallo: [0.0000, 5.0000]</span>
+            <canvas id="gss-canvas" width="680" height="290" style="max-width:100%; height:auto;"></canvas>
+            <span class="stage-overlay-br">Fattore riduzione: 1/φ ≈ 0.618</span>
+          </div>
+
+          <div class="metrics-row">
+            <div class="metric-box"><span class="m-label">Estremo a</span><div class="m-val" id="gss-a-val">0.00000</div></div>
+            <div class="metric-box"><span class="m-label">Estremo b</span><div class="m-val" id="gss-b-val">5.00000</div></div>
+            <div class="metric-box"><span class="m-label">Minimo x*</span><div class="m-val" id="gss-xmin-val">2.50000</div></div>
+            <div class="metric-box"><span class="m-label">Ampiezza (b − a)</span><div class="m-val" id="gss-width-val">5.00000</div></div>
+          </div>
+        </div>
+
+        <div class="doc-example-list">
+          <div class="doc-card sci-card">
+            <div class="doc-card-head">
+              <span class="doc-card-title">Golden Section Search, Fibonacci Search & Heap O(1)</span>
+              <span class="badge badge-high">Complessità Ottimale</span>
+            </div>
+            <p class="doc-card-body">
+              Il GSS riutilizza uno dei due punti interni ad ogni iterazione ($x_1 = b - (b-a)/\varphi$, $x_2 = a + (b-a)/\varphi$) richiedendo una sola nuova valutazione funzionale per ciclo. La <strong>Fibonacci Search</strong> cerca in array ordinati usando solo addizioni/sottrazioni (zero divisioni su FPGA/DSP), mentre il <strong>Fibonacci Heap</strong> (Fredman-Tarjan, 1984) riduce a $O(1)$ ammortizzato <em>insert</em> e <em>decrease-key</em> nell'algoritmo di Dijkstra.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         SEZIONE 05: ARCHITETTURA, STORIA DELLE RELIGIONI & ETNOMATEMATICA AFRICANA
+         ===================================================================== -->
+    <section class="section-block" id="sec-arch">
+      <div class="section-header">
+        <div>
+          <span class="section-num">Sezione 05 // Antropometria, Tradizioni Religiose/Mistiche & African Fractals</span>
+          <h2 class="section-title">Modulor 3D, Frattali Africani (Logone-Birni & Kente), Girih & Audit delle Religioni</h2>
+        </div>
+        <span class="badge badge-med">Include Verifica Storico-Religiosa</span>
+      </div>
+
+      <div class="golden-split">
+        <div class="lab-card gold-border">
+          <div class="card-header">
+            <div class="card-title">Visualizzatore 3D: Modulor, Piramide di Keplero, Girih & Palazzo di Logone-Birni</div>
+            <select id="arch-model-select" style="width:auto;" onchange="switchArchModel(this.value)">
+              <option value="modulor">Modulor di Le Corbusier (Serie Rossa 113 / Blu 226)</option>
+              <option value="logone">Etnomatematica Africana: Palazzo Reale di Logone-Birni (Camerun)</option>
+              <option value="kepler">Piramide di Giza / Triangolo di Keplero (1 : √φ : φ)</option>
+              <option value="girih">Quasicristallo Decagonale Islamico (Girih / Penrose)</option>
+            </select>
+          </div>
+
+          <div class="canvas-stage" style="height: 360px;" id="arch3d-container">
+            <span class="stage-overlay-label" id="arch3d-lbl">Modello 3D: Modulor Antropometrico (183 / 226 cm)</span>
+            <span class="stage-overlay-br">Ruota con il mouse</span>
+          </div>
+
+          <div class="controls-grid">
+            <div class="control-group">
+              <div class="control-label"><span>Altezza Riferimento Modulor (cm)</span><span class="val" id="mod-h-lbl">183 cm</span></div>
+              <input type="range" id="mod-h-slider" min="150" max="210" value="183" oninput="updateModulorCalc(this.value)">
+            </div>
+            <div class="control-group">
+              <div class="control-label"><span>Serie Rossa & Serie Blu Calcolate</span></div>
+              <div id="modulor-series-out" style="font-family:var(--font-mono); font-size:11px; color:var(--gold-bright);">
+                Plesso Solare: 113.1 cm | Braccio Alzato: 226.2 cm
+              </div>
+            </div>
+          </div>
+
+          <!-- TABELLA CRITICA TRADIZIONI RELIGIOSE E MISTICHE (PARTE III APPENDICE) -->
+          <div style="margin-top:16px;">
+            <div style="font-family:var(--font-mono); font-size:11px; color:var(--gold-primary); text-transform:uppercase; margin-bottom:6px;">
+              Matrice di Verifica Storico-Scientifica delle Tradizioni Religiose e Mistiche
+            </div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Tradizione / Fonte</th>
+                  <th>Presenza Documentata di φ</th>
+                  <th>Natura dell'Evidenza</th>
+                  <th>Valutazione</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Grecia Classica (Euclide)</td>
+                  <td>Sì ("Ragione estrema e media")</td>
+                  <td>Pentagono, dodecaedro, icosaedro (puramente geometrico)</td>
+                  <td><span class="badge badge-high">Alta (Matematica)</span></td>
+                </tr>
+                <tr>
+                  <td>Cristianesimo Rinascimentale (1509)</td>
+                  <td>Sì (Luca Pacioli & Leonardo)</td>
+                  <td><em>De Divina Proportione</em>: simbolismo Trinità, irrazionalità</td>
+                  <td><span class="badge badge-high">Alta (Simbolica)</span></td>
+                </tr>
+                <tr>
+                  <td>Islam Medievale (Isfahan, XV sec.)</td>
+                  <td>Sì (Tassellature <em>Girih</em>)</td>
+                  <td>Quasicristalli decagonali aperiodici (Lu & Steinhardt, 2007)</td>
+                  <td><span class="badge badge-med">Media-Alta</span></td>
+                </tr>
+                <tr>
+                  <td>Africa Sub-Sahariana (Ron Eglash)</td>
+                  <td>Sì (<em>African Fractals</em>)</td>
+                  <td>Spirale aurea del Palazzo di Logone-Birni e trame <em>Kente</em> (1,2,3,5,8,13)</td>
+                  <td><span class="badge badge-high">Alta (Etnomat.)</span></td>
+                </tr>
+                <tr>
+                  <td>Bibbia, Kabbalah Antica, Mandala</td>
+                  <td>Non dimostrata storicamente</td>
+                  <td>Riletture numerologiche moderne prive di fonti primarie</td>
+                  <td><span class="badge badge-myth">Bassa (Mito)</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="doc-example-list">
+          <div class="doc-card sci-card">
+            <div class="doc-card-head">
+              <span class="doc-card-title">1. African Fractals: Logone-Birni e Tessuto Kente</span>
+              <span class="badge badge-high">Ron Eglash</span>
+            </div>
+            <p class="doc-card-body">
+              In Camerun, il Palazzo Reale di Logone-Birni utilizza una spirale architettonica di cortili e stanze che si restringono in progressione aurea per codificare la gerarchia sociale e rituale man mano che ci si avvicina al sovrano. In Ghana, i tessitori del panno sacro <em>Kente</em> strutturano le trame secondo la serie additiva $1, 2, 3, 5, 8, 13$ ben prima del contatto coloniale europeo.
+            </p>
+          </div>
+
+          <div class="doc-card sci-card">
+            <div class="doc-card-head">
+              <span class="doc-card-title">2. Luca Pacioli (1509) vs Esoterismo Moderno</span>
+              <span class="badge badge-info">Storia delle Idee</span>
+            </div>
+            <p class="doc-card-body">
+              Come chiarito nell'Appendice di ricerca, occorre distinguere la geometria di Euclide e la teologia simbolica documentata del frate francescano Luca Pacioli (che associò i 3 termini del rapporto alla Trinità e l'irrazionalità di $\varphi$ all'incomprensibilità divina) dalle infondate attribuzioni moderne della <em>Sacred Geometry</em> a testi biblici, cabalistici o mandala orientali.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         SEZIONE 06: DESIGN UI/UX, ACUSTICA 833 CENT & I 4 LIVELLI MUSICALI
+         ===================================================================== -->
+    <section class="section-block" id="sec-design">
+      <div class="section-header">
+        <div>
+          <span class="section-num">Sezione 06 // Design Grafico, Sintesi Microtonale 833 Cent & Musicologia Critica</span>
+          <h2 class="section-title">Griglie UI/UX, Sintetizzatore 833 Cent & Protocollo a 4 Livelli per Bartók/Debussy</h2>
+        </div>
+        <span class="badge badge-high">Include Protocollo Probatorio a 4 Livelli</span>
+      </div>
+
+      <div class="golden-split">
+        <div class="lab-card gold-border">
+          <div class="card-header">
+            <div class="card-title">Sintetizzatore WebAudio (833 Cent / Bohlen-Pierce) & Audit Statistico a 4 Livelli</div>
+            <select id="synth-scale-select" style="width:auto;" onchange="buildSynthKeyboard()">
+              <option value="833">Scala Aurea di Heinz Bohlen (833.09 Cent, Ripetizione φ)</option>
+              <option value="bp">Scala Bohlen-Pierce (Tritava 3:1, 13 Gradini Dispari)</option>
+              <option value="12tet">Scala Temperata Classica 12-TET (Ottava 2:1)</option>
+            </select>
+          </div>
+
+          <div class="synth-keys" id="synth-keyboard-container"></div>
+
+          <!-- AUDIT MUSICALE A 4 LIVELLI + CONFRONTO IPOTESI NULLE (0.500, 0.600, 0.618, 0.667, 0.700) -->
+          <div style="margin-top:18px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.08);">
+            <div style="font-family:var(--font-mono); font-size:11px; color:var(--gold-primary); text-transform:uppercase; margin-bottom:10px;">
+              Calcolatore Musicologico Critico (Bartók / Debussy / Xenakis): Confronto Ipotesi Nulle & 4 Livelli
+            </div>
+            <div class="controls-grid" style="margin-top:0;">
+              <div class="control-group">
+                <div class="control-label"><span>Durata Totale T (Battute o Sec)</span></div>
+                <input type="number" id="mus-total-t" value="89" oninput="updateMusicalAudit()">
+              </div>
+              <div class="control-group">
+                <div class="control-label"><span>Posizione Evento / Climax ($t_i$)</span></div>
+                <input type="number" id="mus-event-t" value="55" oninput="updateMusicalAudit()">
+              </div>
+              <div class="control-group">
+                <div class="control-label"><span>N° Eventi Analizzati ($n$, Bias Selezione)</span></div>
+                <input type="number" id="mus-events-n" value="15" oninput="updateMusicalAudit()">
+              </div>
+              <div class="control-group">
+                <div class="control-label"><span>Prove Documentarie / Percettive</span></div>
+                <select id="mus-doc-proof" onchange="updateMusicalAudit()">
+                  <option value="1">Solo misura numerica nella partitura (Liv. 1)</option>
+                  <option value="2">Cambio formale/dinamico netto al punto (Liv. 2)</option>
+                  <option value="3">Schizzi/Lettere d'autore confermano φ (Liv. 3)</option>
+                  <option value="4">Validato da test percettivi su ascoltatori (Liv. 4)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="verdict-banner" id="mus-audit-output" style="margin-top:12px;"></div>
+          </div>
+        </div>
+
+        <div class="doc-example-list">
+          <div class="doc-card sci-card">
+            <div class="doc-card-head">
+              <span class="doc-card-title">1. I 4 Livelli di Affermazione Musicologica</span>
+              <span class="badge badge-high">Prevenzione Cherry-Picking</span>
+            </div>
+            <p class="doc-card-body">
+              Come stabilito nell'Appendice Parte I, trovare un numero vicino a $0.618$ (<strong>Livello 1: Corrispondenza numerica</strong>) non dimostra né la <strong>Coerenza strutturale (Livello 2)</strong>, né l'<strong>Intenzionalità del compositore (Livello 3)</strong>, né l'<strong>Efficacia percettiva (Livello 4)</strong>. Inoltre, se si esaminano $n=20$ eventi con tolleranza $\pm 2\%$ ($w=0.04$), la probabilità di trovare un "evento aureo" per puro caso è $1-(1-0.04)^{20} = 55.8\%$!
+            </p>
+          </div>
+
+          <div class="doc-card">
+            <div class="doc-card-head">
+              <span class="doc-card-title">2. Layout UI/UX (1440px → 890/550px) & Studio TU Delft</span>
+              <span class="badge badge-med">Design Empirico</span>
+            </div>
+            <p class="doc-card-body">
+              Nel design editoriale (A3: $183.5 \times 259.6\text{ mm}$) e web ($1440\text{ px} \to 890 + 550\text{ px}$, scala font $16 \to 26 \to 42 \to 68\text{ px}$) $\varphi$ offre una solida gerarchia asimmetrica, ma in UI ad alta densità sono preferibili scale $1.200\text{–}1.250$ e griglie a $8\text{ px}$.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         SEZIONE 07: LABORATORIO 3D DI BIOMECCANICA, TANGO, RITMO CINETICO & FINANZA
+         ===================================================================== -->
+    <section class="section-block" id="sec-tango">
+      <div class="section-header">
+        <div>
+          <span class="section-num">Sezione 07 // Biomeccanica 3D, Tango, Dissociazione a Spirale & Finanza Critica</span>
+          <h2 class="section-title">Simulatore Cinetico 3D di Postura/Tango (Asse, Dissociazione, Metronomo) & HFT</h2>
+        </div>
+        <span class="badge badge-high">Nuovo Laboratorio Cinetico 3D WebGL</span>
+      </div>
+
+      <div class="golden-split">
+        <div class="lab-card gold-border">
+          <div class="card-header">
+            <div class="card-title">Simulatore Biomeccanico 3D (2 Piani): Asse, Dissociazione Toraco-Pelvica & Ritmo Fibonacci</div>
+            <div style="display:flex; gap:6px;">
+              <button class="btn-action emerald" id="btn-tango-metronome" onclick="toggleFibonacciMetronome()">🥁 Avvia Metronomo Fibonacci (1-1-2-3-5)</button>
+            </div>
+          </div>
+
+          <div class="canvas-stage" style="height: 380px;" id="tango3d-container">
+            <span class="stage-overlay-label" id="tango3d-lbl">Vista 3D & Piano Trasversale: Asse Verticale, Dissociazione & Poligono d'Appoggio</span>
+            <span class="stage-overlay-br" id="tango3d-sub">Allineamento Spalle-Anche-Avampiede</span>
+          </div>
+
+          <div class="controls-grid">
+            <div class="control-group">
+              <div class="control-label"><span>Dissociazione Torace-Bacino (°)</span><span class="val" id="tango-torsion-lbl">45° (Funzionale)</span></div>
+              <input type="range" id="tango-torsion-slider" min="0" max="137.5" step="0.5" value="45" oninput="updateTangoBiomechanics()">
+            </div>
+            <div class="control-group">
+              <div class="control-label"><span>Ripartizione Peso Avampiede (%)</span><span class="val" id="tango-weight-lbl">61.8% (Pivot Dinamico)</span></div>
+              <input type="range" id="tango-weight-slider" min="30" max="85" step="0.2" value="61.8" oninput="updateTangoBiomechanics()">
+            </div>
+            <div class="control-group">
+              <div class="control-label"><span>Velocità Angolare Pivot (rad/s)</span><span class="val" id="tango-omega-lbl">1.62 rad/s</span></div>
+              <input type="range" id="tango-omega-slider" min="0" max="4" step="0.1" value="1.6" oninput="updateTangoBiomechanics()">
+            </div>
+            <div class="control-group">
+              <div class="control-label"><span>Durata Sessione Pratica (Min)</span><span class="val" id="tango-time-lbl">60 min → 37.1 / 22.9</span></div>
+              <input type="range" id="tango-time-slider" min="30" max="120" step="5" value="60" oninput="updateTangoBiomechanics()">
+            </div>
+          </div>
+
+          <div class="verdict-banner" id="tango-verdict-box">
+            <!-- Popolato da JS -->
+          </div>
+        </div>
+
+        <div class="doc-example-list">
+          <div class="doc-card sci-card">
+            <div class="doc-card-head">
+              <span class="doc-card-title">1. Biomeccanica del Movimento (Tango & Pilates): Uso Prudente di φ</span>
+              <span class="badge badge-high">Protocollo Sez. 10 & 14.5</span>
+            </div>
+            <p class="doc-card-body">
+              Come stabilito nel documento scientifico, la proporzione aurea nel movimento umano è una <strong>metafora organizzativa e temporale</strong> (es. partizione di una pratica di 60 minuti in $37.1\text{ min}$ di nucleo centrale e $22.9\text{ min}$ di tecnica/attivazione, o distribuzione dinamica del carico $61.8\%$ sull'avampiede per ridurre l'attrito del tacco durante il pivot), ma <strong>non deve mai sostituire i limiti anatomici reali</strong>: forzare una dissociazione toraco-pelvica di $137.5^\circ$ (angolo aureo) senza ruotare la base di appoggio produrrebbe un collasso dell'asse verticale e sovraccarico lombare (il range fisiologico sicuro è $35^\circ\text{–}60^\circ$).
+            </p>
+          </div>
+
+          <div class="doc-card myth-card">
+            <div class="doc-card-head">
+              <span class="doc-card-title">2. Finanza Operativa: Onde di Elliott (5-3) & Profezia Auto-Avverante HFT</span>
+              <span class="badge badge-med">Psicologia di Massa</span>
+            </div>
+            <p class="doc-card-body">
+              Nei mercati finanziari (Forex, Dow Jones), i test statistici (Batchelor e Ramyar) smentiscono che le Onde di Elliott ($5$ impulsive, $3$ correttive) siano una legge fisica della natura. Il rimbalzo sul livello di ritracciamento del $61.8\%$ ($1/\varphi$) avviene per <strong>profezia auto-avverante</strong>: gli algoritmi High-Frequency Trading (HFT) concentrano simultaneamente gli ordini su quella soglia psicologica condivisa.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =======================================================================
+       MODALE GITHUB + CLAUDE CODE (SOLO MODALITÀ A: CLAUDE GITHUB APP WEB)
+       ======================================================================= -->
+  <div class="modal-backdrop" id="github-modal">
+    <div class="modal-window">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; padding-bottom:10px; border-bottom:1px solid var(--gold-muted);">
+        <h3 style="font-family:var(--font-serif); font-size:24px; color:var(--gold-bright);">
+          Integrazione GitHub + Claude Code (Esclusivamente Modalità A — Zero API Key)
+        </h3>
+        <button class="btn-action" onclick="closeGithubModal()">✕ Chiudi</button>
+      </div>
+
+      <p style="font-size:13.5px; color:var(--text-secondary); margin-bottom:16px;">
+        Questo progetto è predisposto per lavorare in <strong>Modalità A pura</strong>: usando l'app ufficiale <strong>Claude GitHub App</strong> collegata a <code>claude.ai/code</code> (o all'app desktop di Claude) tramite il tuo abbonamento, <strong>senza alcuna chiave API a consumo e senza dover configurare GitHub Actions o Secrets</strong>.
+      </p>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px;">
+        <button class="github-export-btn" onclick="downloadSingleFile('index.html', getFullHtmlSource())">
+          ⬇️ 1. Scarica index.html
+        </button>
+        <button class="btn-action emerald" onclick="downloadSingleFile('CLAUDE.md', getClaudeMdSource())">
+          🤖 2. Scarica CLAUDE.md (Istruzioni per Claude App)
+        </button>
+        <button class="btn-action cyan" onclick="downloadSingleFile('README.md', getReadmeSource())">
+          📄 3. Scarica README.md
+        </button>
+        <button class="btn-action" onclick="downloadSingleFile('golden_section_search.py', getPythonGssSource())">
+          🐍 4. Scarica golden_section_search.py
+        </button>
+      </div>
+
+      <h4 style="font-family:var(--font-mono); font-size:12px; color:var(--gold-primary); text-transform:uppercase;">
+        Procedura Operativa in 3 Passi (Modalità A — Senza API Key)
+      </h4>
+      <pre class="code-pre">1. CREA IL REPOSITORY E CARICA I FILE:
+   Crea un nuovo repository su GitHub (es. "phi-lab") e carica nella root:
+   - index.html
+   - CLAUDE.md
+   - README.md
+   - golden_section_search.py
+   Attiva GitHub Pages da Settings -> Pages -> Branch: main -> Save.
+
+2. INSTALLA LA CLAUDE GITHUB APP UFFICIALE:
+   Vai su https://github.com/apps/claude
+   Clicca su "Install" / "Configure" e autorizza il repository "phi-lab".
+
+3. APRI IL REPOSITORY IN CLAUDE CODE WEB / APP:
+   Vai su https://claude.ai/code (oppure apri la scheda Code nell'app Claude).
+   Seleziona il repository "phi-lab": Claude leggerà automaticamente il file CLAUDE.md,
+   rispetterà i vincoli scientifici anti-mito e creerà branch e Pull Request direttamente!</pre>
+    </div>
+  </div>
+
+  <!-- =======================================================================
+       MOTORE JAVASCRIPT SCIENTIFICO, WEBGL (GPU-SAFE) E SINTESI AUDIO
+       ======================================================================= -->
+  <script>
+    const PHI = (1 + Math.sqrt(5)) / 2; // 1.618033988749895
+    const INV_PHI = 1 / PHI;            // 0.6180339887498949
+    const GOLDEN_ANGLE_DEG = 360 * (1 - INV_PHI); // 137.50776405003785
+
+    function scrollToSec(id) {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function switchTransTab(tab) {
+      document.getElementById('tab-btn-img').classList.toggle('active', tab === 'img');
+      document.getElementById('tab-btn-chem').classList.toggle('active', tab === 'chem');
+      document.getElementById('trans-panel-img').style.display = tab === 'img' ? 'grid' : 'none';
+      document.getElementById('trans-panel-chem').style.display = tab === 'chem' ? 'grid' : 'none';
+      if (tab === 'chem') {
+        setTimeout(() => {
+          onAllThreeResize();
+          processUniversalInput();
+        }, 60);
+      }
+    }
+
+    // =========================================================================
+    // BUG FIX #2 & #4: GESTIONE MEMORIA GPU WEBGL, INTERSECTION & RESIZE OBSERVER
+    // =========================================================================
+    function clearAndDisposeGroup(group) {
+      if (!group) return;
+      for (let i = group.children.length - 1; i >= 0; i--) {
+        const obj = group.children[i];
+        if (obj.children && obj.children.length > 0) clearAndDisposeGroup(obj);
+        group.remove(obj);
+        if (obj.geometry) obj.geometry.dispose();
+        if (obj.material) {
+          if (Array.isArray(obj.material)) obj.material.forEach(m => m.dispose());
+          else obj.material.dispose();
+        }
+      }
+    }
+
+    const visibleWebGLIds = new Set(['chem3d-container', 'kam3d-container', 'arch3d-container', 'tango3d-container']);
+    const webglIntersectionObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) visibleWebGLIds.add(e.target.id);
+        else visibleWebGLIds.delete(e.target.id);
+      });
+    }, { threshold: 0.02 });
+
+    // =========================================================================
+    // MODULO A: TRASFORMATORE IMMAGINI + ALGORITMO DI SOBEL SUL BUFFER PULITO
+    // =========================================================================
+    let currentImageObj = null;
+    const cleanOffscreenCanvas = document.createElement('canvas');
+    const cleanOffscreenCtx = cleanOffscreenCanvas.getContext('2d', { willReadFrequently: true });
+    let lastSobelData = null; // { width, height, gradMag, comX, comY }
+
+    function createArchetypeCanvas(type) {
+      const c = document.createElement('canvas');
+      c.width = 900; c.height = 600;
+      const ctx = c.getContext('2d');
+
+      if (type === 'sunflower') {
+        const grad = ctx.createRadialGradient(450, 300, 15, 450, 300, 420);
+        grad.addColorStop(0, '#1a1206'); grad.addColorStop(0.55, '#3b280a'); grad.addColorStop(1, '#090d16');
+        ctx.fillStyle = grad; ctx.fillRect(0, 0, 900, 600);
+        for (let n = 1; n <= 420; n++) {
+          const a = n * GOLDEN_ANGLE_DEG * Math.PI / 180;
+          const r = 11.5 * Math.sqrt(n);
+          const x = 450 + r * Math.cos(a);
+          const y = 300 + r * Math.sin(a);
+          ctx.beginPath(); ctx.arc(x, y, 2.5 + (n / 420) * 4, 0, Math.PI * 2);
+          ctx.fillStyle = n % 21 === 0 ? '#f59e0b' : (n % 13 === 0 ? '#d4af37' : '#a16207');
+          ctx.fill();
+        }
+      } else if (type === 'parthenon') {
+        ctx.fillStyle = '#0d1524'; ctx.fillRect(0, 0, 900, 600);
+        ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 3;
+        ctx.strokeRect(140, 390, 620, 55);
+        for (let i = 0; i < 8; i++) {
+          const x = 165 + i * 78;
+          ctx.fillStyle = 'rgba(226, 232, 240, 0.25)';
+          ctx.fillRect(x, 195, 28, 195);
+          ctx.strokeRect(x, 195, 28, 195);
+        }
+        ctx.beginPath(); ctx.moveTo(130, 195); ctx.lineTo(450, 95); ctx.lineTo(770, 195); ctx.closePath();
+        ctx.fillStyle = 'rgba(212,175,55,0.18)'; ctx.fill(); ctx.stroke();
+      } else if (type === 'nautilus') {
+        ctx.fillStyle = '#07111e'; ctx.fillRect(0, 0, 900, 600);
+        ctx.save(); ctx.translate(480, 310);
+        ctx.beginPath();
+        const bNaut = Math.log(1.31) / (Math.PI / 2);
+        for (let t = 0; t <= 6 * Math.PI; t += 0.04) {
+          const r = 4.2 * Math.exp(bNaut * t);
+          const x = r * Math.cos(t); const y = r * Math.sin(t);
+          if (t === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 4; ctx.stroke();
+        ctx.restore();
+      } else {
+        // Ritratto editoriale decentrato (soggetto posto vicino a X=62%, Y=38%)
+        const g = ctx.createLinearGradient(0, 0, 900, 600);
+        g.addColorStop(0, '#0f172a'); g.addColorStop(1, '#1e1b4b');
+        ctx.fillStyle = g; ctx.fillRect(0, 0, 900, 600);
+        const fx = 556, fy = 229; // Nodo aureo
+        const rg = ctx.createRadialGradient(fx, fy, 10, fx, fy, 170);
+        rg.addColorStop(0, '#f3e5ab'); rg.addColorStop(0.4, '#d4af37'); rg.addColorStop(1, 'transparent');
+        ctx.fillStyle = rg; ctx.beginPath(); ctx.arc(fx, fy, 170, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.arc(fx, fy, 42, 0, Math.PI * 2); ctx.stroke();
+        ctx.beginPath(); ctx.arc(fx - 14, fy - 8, 5, 0, Math.PI * 2); ctx.stroke();
+        ctx.beginPath(); ctx.arc(fx + 14, fy - 8, 5, 0, Math.PI * 2); ctx.stroke();
+      }
+      return c;
+    }
+
+    function loadPresetImage(preset) {
+      currentImageObj = createArchetypeCanvas(preset);
+      renderImgCanvas();
+    }
+
+    function handleUserImage(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        const img = new Image();
+        img.onload = function() {
+          currentImageObj = img;
+          renderImgCanvas();
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Calcola il gradiente di Sobel sul buffer pixel PULITO (Bug #1 risolto!)
+    function computeCleanSobelMap(w, h) {
+      const imgData = cleanOffscreenCtx.getImageData(0, 0, w, h).data;
+      const gray = new Float32Array(w * h);
+      for (let i = 0; i < w * h; i++) {
+        const idx = i * 4;
+        gray[i] = 0.299 * imgData[idx] + 0.587 * imgData[idx + 1] + 0.114 * imgData[idx + 2];
+      }
+      const grad = new Float32Array(w * h);
+      let sumGrad = 0, sumX = 0, sumY = 0;
+      for (let y = 1; y < h - 1; y++) {
+        for (let x = 1; x < w - 1; x++) {
+          const gx =
+            -gray[(y - 1) * w + (x - 1)] + gray[(y - 1) * w + (x + 1)]
+            - 2 * gray[y * w + (x - 1)] + 2 * gray[y * w + (x + 1)]
+            - gray[(y + 1) * w + (x - 1)] + gray[(y + 1) * w + (x + 1)];
+          const gy =
+            -gray[(y - 1) * w + (x - 1)] - 2 * gray[(y - 1) * w + x] - gray[(y - 1) * w + (x + 1)]
+            + gray[(y + 1) * w + (x - 1)] + 2 * gray[(y + 1) * w + x] + gray[(y + 1) * w + (x + 1)];
+          const mag = Math.sqrt(gx * gx + gy * gy);
+          grad[y * w + x] = mag;
+          if (mag > 35) {
+            sumGrad += mag;
+            sumX += x * mag;
+            sumY += y * mag;
+          }
+        }
+      }
+      const comX = sumGrad > 0 ? sumX / sumGrad : w * 0.5;
+      const comY = sumGrad > 0 ? sumY / sumGrad : h * 0.5;
+      return { width: w, height: h, grad, comX, comY };
+    }
+
+    function sampleNodeEnergy(sobel, ratiosX, ratiosY) {
+      const { width: w, height: h, grad } = sobel;
+      const radius = Math.max(10, Math.round(Math.min(w, h) * 0.045));
+      let total = 0, count = 0;
+      ratiosX.forEach(rx => {
+        ratiosY.forEach(ry => {
+          const cx = Math.round(w * rx);
+          const cy = Math.round(h * ry);
+          for (let dy = -radius; dy <= radius; dy++) {
+            for (let dx = -radius; dx <= radius; dx++) {
+              const px = cx + dx, py = cy + dy;
+              if (px >= 1 && px < w - 1 && py >= 1 && py < h - 1) {
+                total += grad[py * w + px];
+                count++;
+              }
+            }
+          }
+        });
+      });
+      return count > 0 ? (total / count) : 0;
+    }
+
+    function renderImgCanvas() {
+      if (!currentImageObj) return;
+      const canvas = document.getElementById('img-transformer-canvas');
+      const ctx = canvas.getContext('2d');
+      const mode = document.getElementById('img-mode-select').value;
+      const rot = parseInt(document.getElementById('img-spiral-rot').value, 10);
+      const showSpiral = document.getElementById('chk-spiral').checked;
+      const showThirds = document.getElementById('chk-thirds').checked;
+      const showSqrt2 = document.getElementById('chk-sqrt2').checked;
+      const showSobel = document.getElementById('chk-sobel-map').checked;
+
+      const srcW = currentImageObj.width;
+      const srcH = currentImageObj.height;
+      const origRatio = srcW / srcH;
+
+      let cw = 800;
+      let ch = Math.round(cw / PHI);
+      let sx = 0, sy = 0, sw = srcW, sh = srcH;
+
+      if (mode === 'crop-phi') {
+        if (origRatio > PHI) {
+          sw = Math.round(srcH * PHI);
+          sx = Math.round((srcW - sw) / 2);
+        } else {
+          sh = Math.round(srcW / PHI);
+          sy = Math.round((srcH - sh) / 2);
+        }
+        document.getElementById('img-stage-label').textContent = 'Ritaglio Aureo Centrato (1 : 1.618)';
+      } else if (mode === 'smart-crop-sobel') {
+        // Primo passaggio su immagine intera per trovare il centro di massa di Sobel
+        cleanOffscreenCanvas.width = srcW;
+        cleanOffscreenCanvas.height = srcH;
+        cleanOffscreenCtx.drawImage(currentImageObj, 0, 0);
+        const fullSobel = computeCleanSobelMap(srcW, srcH);
+        if (origRatio > PHI) {
+          sw = Math.round(srcH * PHI);
+          // Posiziona sw affinché fullSobel.comX cada a 0.618 * sw
+          sx = Math.round(fullSobel.comX - sw * INV_PHI);
+          sx = Math.max(0, Math.min(srcW - sw, sx));
+        } else {
+          sh = Math.round(srcW / PHI);
+          sy = Math.round(fullSobel.comY - sh * (1 - INV_PHI));
+          sy = Math.max(0, Math.min(srcH - sh, sy));
+        }
+        document.getElementById('img-stage-label').textContent = 'Smart Auto-Crop Sobel (Soggetto → Nodo φ 61.8%)';
+      } else if (mode === 'stretch-phi') {
+        document.getElementById('img-stage-label').textContent = 'Riscalatura Anamorfica Aurea (W = H × φ)';
+      } else if (mode === 'fib-mosaic') {
+        document.getElementById('img-stage-label').textContent = 'Scomposizione Modulare di Fibonacci';
+      } else {
+        cw = 800;
+        ch = Math.round(800 / origRatio);
+        document.getElementById('img-stage-label').textContent = `Formato Originale (1 : ${origRatio.toFixed(3)})`;
+      }
+
+      canvas.width = cw;
+      canvas.height = ch;
+      cleanOffscreenCanvas.width = cw;
+      cleanOffscreenCanvas.height = ch;
+
+      // Disegna prima sul buffer offscreen PULITO per l'analisi di Sobel (ZERO inquinamento overlay!)
+      cleanOffscreenCtx.clearRect(0, 0, cw, ch);
+      cleanOffscreenCtx.drawImage(currentImageObj, sx, sy, sw, sh, 0, 0, cw, ch);
+      lastSobelData = computeCleanSobelMap(cw, ch);
+
+      // Ora disegna sul canvas visibile
+      ctx.clearRect(0, 0, cw, ch);
+      ctx.drawImage(cleanOffscreenCanvas, 0, 0);
+
+      // Opzione: Mostra Mappa Salienza di Sobel
+      if (showSobel && lastSobelData) {
+        const overlay = ctx.createImageData(cw, ch);
+        for (let i = 0; i < cw * ch; i++) {
+          const m = Math.min(255, lastSobelData.grad[i]);
+          overlay.data[i * 4] = m;
+          overlay.data[i * 4 + 1] = Math.round(m * 0.78);
+          overlay.data[i * 4 + 2] = 20;
+          overlay.data[i * 4 + 3] = 215;
+        }
+        ctx.putImageData(overlay, 0, 0);
+      }
+
+      if (mode === 'fib-mosaic') {
+        drawFibonacciSubdivision(ctx, cw, ch);
+      }
+      if (showThirds) {
+        drawGridLines(ctx, cw, ch, [1/3, 2/3], [1/3, 2/3], '#38bdf8', [6, 5]);
+      }
+      if (showSqrt2) {
+        const r2 = 1 / 1.41421356;
+        drawGridLines(ctx, cw, ch, [1 - r2, r2], [1 - r2, r2], '#f472b6', [3, 4]);
+      }
+      if (showSpiral) {
+        drawGridLines(ctx, cw, ch, [1 - INV_PHI, INV_PHI], [1 - INV_PHI, INV_PHI], 'rgba(212, 175, 55, 0.85)', []);
+        drawTrueGoldenSpiral(ctx, cw, ch, rot);
+      }
+
+      // Disegna indicatore del Centro di Massa di Sobel (x_c, y_c)
+      if (lastSobelData) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(lastSobelData.comX, lastSobelData.comY, 7, 0, Math.PI * 2);
+        ctx.fillStyle = '#10b981';
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#ffffff';
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // Aggiorna metriche sul buffer pulito
+      const phiScore = sampleNodeEnergy(lastSobelData, [1 - INV_PHI, INV_PHI], [1 - INV_PHI, INV_PHI]);
+      const thirdsScore = sampleNodeEnergy(lastSobelData, [1/3, 2/3], [1/3, 2/3]);
+      const r2 = 1 / Math.SQRT2;
+      const sqrt2Score = sampleNodeEnergy(lastSobelData, [1 - r2, r2], [1 - r2, r2]);
+
+      const errPct = (Math.abs(origRatio - PHI) / PHI * 100).toFixed(1);
+      document.getElementById('m-img-orig-ratio').textContent = origRatio.toFixed(3);
+      document.getElementById('m-img-orig-err').textContent = `Scarto orig da φ: ${errPct}%`;
+      document.getElementById('m-img-phi-score').textContent = phiScore.toFixed(1);
+      document.getElementById('m-img-thirds-score').textContent = thirdsScore.toFixed(1);
+      document.getElementById('m-img-sqrt2-score').textContent = sqrt2Score.toFixed(1);
+      document.getElementById('img-stage-dim').textContent = `${cw} × ${ch} px | Baricentro Sobel: (${Math.round(lastSobelData.comX)}, ${Math.round(lastSobelData.comY)})`;
+    }
+
+    function runSobelAutoFit() {
+      if (!lastSobelData) renderImgCanvas();
+      const { width: w, height: h, comX, comY } = lastSobelData;
+      // Determina il quadrante migliore in base al centro di massa di Sobel
+      let bestRot = 0;
+      if (comX >= w / 2 && comY < h / 2) bestRot = 0;
+      else if (comX >= w / 2 && comY >= h / 2) bestRot = 1;
+      else if (comX < w / 2 && comY >= h / 2) bestRot = 2;
+      else bestRot = 3;
+
+      document.getElementById('img-spiral-rot').value = String(bestRot);
+      const qNames = ['Q1 (Alto-Sx)', 'Q2 (Alto-Dx)', 'Q3 (Basso-Dx)', 'Q4 (Basso-Sx)'];
+      document.getElementById('rot-val-lbl').textContent = qNames[bestRot];
+      renderImgCanvas();
+
+      const phiScore = sampleNodeEnergy(lastSobelData, [1 - INV_PHI, INV_PHI], [1 - INV_PHI, INV_PHI]);
+      const thirdsScore = sampleNodeEnergy(lastSobelData, [1/3, 2/3], [1/3, 2/3]);
+      const r2 = 1 / Math.SQRT2;
+      const sqrt2Score = sampleNodeEnergy(lastSobelData, [1 - r2, r2], [1 - r2, r2]);
+
+      const scores = [
+        { name: 'Sezione Aurea φ (1 : 1.618)', val: phiScore },
+        { name: 'Regola dei Terzi (1 : 2)', val: thirdsScore },
+        { name: 'Rapporto √2 (1 : 1.414 — TU Delft)', val: sqrt2Score }
+      ].sort((a, b) => b.val - a.val);
+
+      const box = document.getElementById('sobel-verdict-box');
+      if (scores[0].name.includes('Aurea')) {
+        box.className = 'verdict-banner';
+        box.innerHTML = `<strong>Verdetto Empirico Sobel (Confermato φ):</strong> Sul buffer pixel pulito, la <strong>${scores[0].name}</strong> ottiene la massima densità di gradiente sui nodi (${scores[0].val.toFixed(1)} vs ${scores[1].val.toFixed(1)} di <em>${scores[1].name}</em>). Spirale orientata automaticamente su <strong>${qNames[bestRot]}</strong> verso il baricentro energetico (${Math.round(comX)}, ${Math.round(comY)}).`;
+      } else {
+        box.className = 'verdict-banner warn';
+        box.innerHTML = `<strong>Verdetto "Avvocato del Diavolo" (Falsificazione Empirica):</strong> In questa specifica inquadratura, la griglia <strong>${scores[0].name}</strong> intercetta più contrasto reale (${scores[0].val.toFixed(1)}) rispetto alla griglia aurea (${phiScore.toFixed(1)}). Se vuoi riallineare il soggetto al nodo aureo, seleziona la modalità <em>"Smart Auto-Crop sul Soggetto (Sobel → Nodo φ)"</em>!`;
+      }
+    }
+
+    function drawGridLines(ctx, w, h, xRatios, yRatios, color, dash) {
+      ctx.save();
+      ctx.strokeStyle = color; ctx.lineWidth = 1.6; ctx.setLineDash(dash);
+      xRatios.forEach(rx => {
+        ctx.beginPath(); ctx.moveTo(w * rx, 0); ctx.lineTo(w * rx, h); ctx.stroke();
+      });
+      yRatios.forEach(ry => {
+        ctx.beginPath(); ctx.moveTo(0, h * ry); ctx.lineTo(w, h * ry); ctx.stroke();
+      });
+      ctx.setLineDash([]);
+      xRatios.forEach(rx => {
+        yRatios.forEach(ry => {
+          ctx.beginPath(); ctx.arc(w * rx, h * ry, 5, 0, Math.PI * 2);
+          ctx.fillStyle = color; ctx.fill();
+        });
+      });
+      ctx.restore();
+    }
+
+    function drawTrueGoldenSpiral(ctx, w, h, rot) {
+      ctx.save();
+      ctx.translate(w / 2, h / 2);
+      if (rot === 1) ctx.scale(-1, 1);
+      if (rot === 2) ctx.scale(-1, -1);
+      if (rot === 3) ctx.scale(1, -1);
+      ctx.translate(-w / 2, -h / 2);
+
+      let x = 0, y = 0, rw = w, rh = h;
+      ctx.lineWidth = 1.3;
+      ctx.strokeStyle = 'rgba(243, 229, 171, 0.45)';
+
+      for (let i = 0; i < 8; i++) {
+        ctx.strokeRect(x, y, rw, rh);
+        const dir = i % 4;
+        ctx.beginPath();
+        ctx.lineWidth = 2.8;
+        ctx.strokeStyle = '#d4af37';
+        if (dir === 0) {
+          const sq = rh;
+          ctx.arc(x + sq, y + sq, sq, Math.PI, 1.5 * Math.PI);
+          x += sq; rw -= sq;
+        } else if (dir === 1) {
+          const sq = rw;
+          ctx.arc(x, y + sq, sq, 1.5 * Math.PI, 2 * Math.PI);
+          y += sq; rh -= sq;
+        } else if (dir === 2) {
+          const sq = rh;
+          ctx.arc(x + rw - sq, y, sq, 0, 0.5 * Math.PI);
+          rw -= sq;
+        } else {
+          const sq = rw;
+          ctx.arc(x + sq, y + rh - sq, sq, 0.5 * Math.PI, Math.PI);
+          rh -= sq;
+        }
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawFibonacciSubdivision(ctx, w, h) {
+      let x = 0, y = 0, rw = w, rh = h;
+      const colors = ['rgba(212,175,55,0.22)', 'rgba(56,189,248,0.18)', 'rgba(16,185,129,0.18)', 'rgba(168,85,247,0.18)'];
+      for (let i = 0; i < 7; i++) {
+        const dir = i % 4;
+        ctx.fillStyle = colors[i % colors.length];
+        if (dir === 0) {
+          const sq = rh; ctx.fillRect(x, y, sq, sq); x += sq; rw -= sq;
+        } else if (dir === 1) {
+          const sq = rw; ctx.fillRect(x, y, sq, sq); y += sq; rh -= sq;
+        } else if (dir === 2) {
+          const sq = rh; ctx.fillRect(x + rw - sq, y, sq, sq); rw -= sq;
+        } else {
+          const sq = rw; ctx.fillRect(x, y + rh - sq, sq, sq); rh -= sq;
+        }
+      }
+    }
+
+    function downloadTransformedImage() {
+      const canvas = document.getElementById('img-transformer-canvas');
+      const a = document.createElement('a');
+      a.download = 'phi-lab-sobel-proporzione-aurea.png';
+      a.href = canvas.toDataURL('image/png');
+      a.click();
+    }
+
+    // =========================================================================
+    // MODULO B: VERA CRISTALLOGRAFIA 3D (FULLERENE C60, ICOSAEDRO, .XYZ) + PARSER
+    // =========================================================================
+    const PERIODIC_DB = {
+      H:  { z: 1,  m: 1.008,   name: 'Idrogeno',  col: 0x38bdf8 },
+      C:  { z: 6,  m: 12.011,  name: 'Carbonio',  col: 0xd4af37 },
+      N:  { z: 7,  m: 14.007,  name: 'Azoto',     col: 0x60a5fa },
+      O:  { z: 8,  m: 15.999,  name: 'Ossigeno',  col: 0xf43f5e },
+      Si: { z: 14, m: 28.085,  name: 'Silicio',   col: 0xa855f7 },
+      S:  { z: 16, m: 32.06,   name: 'Zolfo',     col: 0xfacc15 },
+      Ca: { z: 20, m: 40.078,  name: 'Calcio',    col: 0x34d399 },
+      Ti: { z: 22, m: 47.867,  name: 'Titanio',   col: 0x2dd4bf },
+      Co: { z: 27, m: 58.933,  name: 'Cobalto',   col: 0x6366f1 },
+      Nb: { z: 41, m: 92.906,  name: 'Niobio',    col: 0x10b981 },
+      Au: { z: 79, m: 196.967, name: 'Oro',       col: 0xfbbf24 }
+    };
+
+    // Bug #3 Fix: Normalizzatore chimico con supporto pedici Unicode e parentesi
+    function normalizeChemicalFormula(raw) {
+      const subMap = {'₀':'0','₁':'1','₂':'2','₃':'3','₄':'4','₅':'5','₆':'6','₇':'7','₈':'8','₉':'9'};
+      let s = raw.trim().replace(/[₀-₉]/g, c => subMap[c]).replace(/\s+/g, '');
+      const parenRegex = /\(([A-Za-z0-9]+)\)(\d+)/;
+      let safety = 0;
+      while (parenRegex.test(s) && safety < 10) {
+        s = s.replace(parenRegex, (_, group, mult) => {
+          const m = parseInt(mult, 10);
+          return group.replace(/([A-Z][a-z]?)(\d*)/g, (__, el, cnt) => el + ((cnt ? parseInt(cnt, 10) : 1) * m));
+        });
+        safety++;
+      }
+      return s;
+    }
+
+    // Generatore esatto dei 60 vertici del Fullerene C60 (Icosaedro Troncato) tramite coordinate auree
+    function generateC60Vertices() {
+      const raw = [];
+      const evenPerms = (a, b, c) => [[a,b,c], [b,c,a], [c,a,b]];
+      const signs = (arr) => {
+        let res = [[]];
+        for (const v of arr) {
+          const next = [];
+          const choices = v === 0 ? [0] : [v, -v];
+          for (const r of res) for (const c of choices) next.append ? next.push([...r, c]) : next.push(r.concat([c]));
+          res = next;
+        }
+        return res;
+      };
+      // Famiglia 1: (0, ±1, ±3φ) -> 12 vertici
+      evenPerms(0, 1, 3 * PHI).forEach(p => signs(p).forEach(v => raw.push(v)));
+      // Famiglia 2: (±1, ±(2+φ), ±2φ) -> 24 vertici
+      evenPerms(1, 2 + PHI, 2 * PHI).forEach(p => signs(p).forEach(v => raw.push(v)));
+      // Famiglia 3: (±φ, ±2, ±(2φ+1)) -> 24 vertici
+      evenPerms(PHI, 2, 2 * PHI + 1).forEach(p => signs(p).forEach(v => raw.push(v)));
+      return raw.map((c, idx) => ({ symbol: 'C', x: c[0] * 0.42, y: c[1] * 0.42, z: c[2] * 0.42, raw: c, id: idx + 1 }));
+    }
+
+    // Generatore esatto dei 12 vertici dell'Icosaedro Platonico (0, ±1, ±φ)
+    function generateIcosahedronVertices() {
+      const verts = [];
+      const pairs = [[1, PHI], [1, -PHI], [-1, PHI], [-1, -PHI]];
+      pairs.forEach(([a, b]) => {
+        verts.push({ symbol: 'Au', x: 0, y: a * 1.1, z: b * 1.1, raw: [0, a, b] });
+        verts.push({ symbol: 'Au', x: b * 1.1, y: 0, z: a * 1.1, raw: [b, 0, a] });
+        verts.push({ symbol: 'Au', x: a * 1.1, y: b * 1.1, z: 0, raw: [a, b, 0] });
+      });
+      return verts;
+    }
+
+    let chemScene, chemCamera, chemRenderer, chemGroup;
+
+    function initChem3D() {
+      const container = document.getElementById('chem3d-container');
+      const w = container.clientWidth || 420;
+      const h = container.clientHeight || 370;
+      chemScene = new THREE.Scene();
+      chemCamera = new THREE.PerspectiveCamera(45, w / h, 0.1, 1000);
+      chemCamera.position.set(0, 1.2, 7.2);
+
+      chemRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      chemRenderer.setSize(w, h);
+      chemRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      container.appendChild(chemRenderer.domElement);
+
+      chemScene.add(new THREE.AmbientLight(0xffffff, 0.65));
+      const p1 = new THREE.PointLight(0xd4af37, 1.3, 50); p1.position.set(6, 7, 6); chemScene.add(p1);
+      const p2 = new THREE.PointLight(0x38bdf8, 0.9, 50); p2.position.set(-6, -5, 4); chemScene.add(p2);
+
+      chemGroup = new THREE.Group();
+      chemScene.add(chemGroup);
+      attachDragRotation(container, chemGroup, chemCamera);
+    }
+
+    function setQuickInput(val) {
+      document.getElementById('chem-data-input').value = val;
+      processUniversalInput();
+    }
+
+    function parseCustomXYZ() {
+      const txt = document.getElementById('xyz-custom-input').value.trim();
+      if (!txt) return;
+      const lines = txt.split('\n').map(l => l.trim()).filter(Boolean);
+      const atoms = [];
+      lines.forEach((line, i) => {
+        const parts = line.split(/\s+/);
+        if (parts.length >= 4) {
+          const sym = parts[0];
+          const x = parseFloat(parts[1]), y = parseFloat(parts[2]), z = parseFloat(parts[3]);
+          if (!isNaN(x) && !isNaN(y) && !isNaN(z)) {
+            atoms.push({ symbol: sym, x: x * 0.45, y: y * 0.45, z: z * 0.45, raw: [x, y, z], id: i + 1 });
+          }
+        }
+      });
+      if (atoms.length > 0) {
+        renderTrue3DMolecule(atoms, 'Coordinate Molecolari .XYZ Personalizzate', true);
+      }
+    }
+
+    function renderTrue3DMolecule(atoms, title, isCustomXYZ = false) {
+      clearAndDisposeGroup(chemGroup);
+      document.getElementById('chem3d-title-lbl').textContent = `3D WebGL: ${title}`;
+
+      // Disegna sfere atomiche
+      atoms.forEach(a => {
+        const col = PERIODIC_DB[a.symbol] ? PERIODIC_DB[a.symbol].col : 0xd4af37;
+        const geom = new THREE.SphereGeometry(atoms.length > 30 ? 0.13 : 0.22, 20, 20);
+        const mat = new THREE.MeshStandardMaterial({ color: col, roughness: 0.25, metalness: 0.65 });
+        const mesh = new THREE.Mesh(geom, mat);
+        mesh.position.set(a.x, a.y, a.z);
+        chemGroup.add(mesh);
+      });
+
+      // Calcola distanze interatomiche per tracciare i legami reali
+      let minDist = Infinity;
+      for (let i = 0; i < atoms.length; i++) {
+        for (let j = i + 1; j < atoms.length; j++) {
+          const d = Math.hypot(atoms[i].x - atoms[j].x, atoms[i].y - atoms[j].y, atoms[i].z - atoms[j].z);
+          if (d > 0.05 && d < minDist) minDist = d;
+        }
+      }
+
+      const bondCutoff = minDist * 1.28;
+      const bondPairs = [];
+      const lineMat = new THREE.LineBasicMaterial({ color: 0xf3e5ab, transparent: true, opacity: 0.65 });
+
+      for (let i = 0; i < atoms.length; i++) {
+        for (let j = i + 1; j < atoms.length; j++) {
+          const d = Math.hypot(atoms[i].x - atoms[j].x, atoms[i].y - atoms[j].y, atoms[i].z - atoms[j].z);
+          if (d <= bondCutoff) {
+            bondPairs.push([i, j, d]);
+            const pts = [new THREE.Vector3(atoms[i].x, atoms[i].y, atoms[i].z), new THREE.Vector3(atoms[j].x, atoms[j].y, atoms[j].z)];
+            const lg = new THREE.BufferGeometry().setFromPoints(pts);
+            chemGroup.add(new THREE.Line(lg, lineMat));
+          }
+        }
+      }
+
+      // Popola tabella e verdetto
+      const tbody = document.getElementById('universal-table-body');
+      tbody.innerHTML = '';
+      atoms.slice(0, 10).forEach((a, idx) => {
+        const rCoord = a.raw.map(v => v.toFixed(3)).join(', ');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="color:var(--gold-bright); font-weight:600;">${a.symbol}#${idx + 1}</td>
+          <td>(${rCoord})</td>
+          <td>d_min = ${(minDist / 0.42).toFixed(3)} Å</td>
+          <td style="color:var(--cyan-sci);">Diag/Lato Pentagono = φ (1.618)</td>
+          <td>108.0° (cos 36° = φ/2)</td>
+          <td><span class="badge badge-high">Simmetria Icosaedrica Reale</span></td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      const verdict = document.getElementById('chem-verdict-banner');
+      verdict.className = 'verdict-banner';
+      verdict.innerHTML = `<strong>Validazione Cristallografica 3D (${title}):</strong> Generati <strong>${atoms.length} vertici atomici</strong> e <strong>${bondPairs.length} legami</strong>. A differenza della numerologia sui pesi atomici, qui $\\varphi = 1.618034$ governa fisicamente le coordinate spaziali $(0, \\pm 1, \\pm 3\\varphi)$ e i cicli pentagonali con angolo di legame $108^\\circ$.`;
+
+      draw2DRadialAnalysis(atoms.slice(0, 12).map((a, i) => ({
+        label: `${a.symbol}${i+1}`,
+        val: Math.hypot(a.raw[0], a.raw[1], a.raw[2])
+      })));
+    }
+
+    function processUniversalInput() {
+      const raw = document.getElementById('chem-data-input').value.trim();
+      if (!raw) return;
+      const upper = raw.toUpperCase();
+
+      if (upper === 'C60' || upper === 'FULLERENE') {
+        renderTrue3DMolecule(generateC60Vertices(), 'Fullerene C₆₀ (Coordinate Auree Icosaedriche)');
+        return;
+      }
+      if (upper === 'ICOSAHEDRON' || upper === 'ICOSAEDRO') {
+        renderTrue3DMolecule(generateIcosahedronVertices(), 'Icosaedro Platonico (3 Rettangoli Aurei Ortogonali)');
+        return;
+      }
+
+      // Verifica se è una formula chimica valida
+      const norm = normalizeChemicalFormula(raw);
+      const chemRegex = /^([A-Z][a-z]?\d*)+$/;
+      if (chemRegex.test(norm)) {
+        const matches = [...norm.matchAll(/([A-Z][a-z]?)(\d*)/g)];
+        const items = [];
+        let allKnown = true;
+        matches.forEach(m => {
+          if (!m[1]) return;
+          const sym = m[1];
+          const count = m[2] ? parseInt(m[2], 10) : 1;
+          if (!PERIODIC_DB[sym]) allKnown = false;
+          const info = PERIODIC_DB[sym] || { z: 6, m: 12, name: sym, col: 0xd4af37 };
+          items.push({
+            label: `${sym}${count > 1 ? count : ''} (${info.name})`,
+            symbol: sym,
+            count,
+            val: info.m * count,
+            z: info.z,
+            color: info.col
+          });
+        });
+
+        if (allKnown && items.length > 0) {
+          renderStoichiometric3DAndTable(raw, items);
+          return;
+        }
+      }
+
+      // Altrimenti serie numerica
+      const nums = raw.split(/[\s,;]+/).map(x => parseFloat(x)).filter(x => !isNaN(x));
+      if (nums.length > 0) {
+        const items = nums.map((n, i) => ({
+          label: `Termine #${i + 1}`,
+          symbol: 'N',
+          count: 1,
+          val: Math.abs(n) || 1,
+          rawVal: n,
+          color: i % 2 === 0 ? 0xd4af37 : 0x38bdf8
+        }));
+        renderStoichiometric3DAndTable(`Serie Numerica (${nums.length} elementi)`, items, true);
+      }
+    }
+
+    function renderStoichiometric3DAndTable(title, items, isNumeric = false) {
+      clearAndDisposeGroup(chemGroup);
+      document.getElementById('chem3d-title-lbl').textContent = `3D WebGL: ${title}`;
+
+      const tbody = document.getElementById('universal-table-body');
+      tbody.innerHTML = '';
+
+      items.forEach((it, idx) => {
+        const nextIt = items[(idx + 1) % items.length];
+        const a = Math.max(it.val, nextIt.val);
+        const b = Math.min(it.val, nextIt.val) || 1;
+        const ratio = a / b;
+        const errPct = Math.abs(ratio - PHI) / PHI * 100;
+        const rotAngle = ((idx + 1) * GOLDEN_ANGLE_DEG) % 360;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="color:var(--gold-bright); font-weight:600;">${it.label}</td>
+          <td>${it.val.toFixed(2)}</td>
+          <td>φ Target: ${(it.val * INV_PHI).toFixed(2)}</td>
+          <td style="color:var(--cyan-sci);">${ratio.toFixed(4)} (${errPct.toFixed(1)}% da φ)</td>
+          <td>${rotAngle.toFixed(1)}°</td>
+          <td>${errPct < 5 ? '<span class="badge badge-high">Convergente a φ</span>' : '<span class="badge badge-med">Stechiometrico Standard</span>'}</td>
+        `;
+        tbody.appendChild(tr);
+
+        // Posizionamento a fillotassi 3D
+        const count = Math.min(it.count || 1, 12);
+        for (let c = 0; c < count; c++) {
+          const k = idx * 3 + c + 1;
+          const theta = k * GOLDEN_ANGLE_DEG * Math.PI / 180;
+          const rad = 0.55 * Math.sqrt(k);
+          const z = (k - items.length * 1.5) * 0.25;
+          const x = rad * Math.cos(theta);
+          const y = rad * Math.sin(theta);
+
+          const sphere = new THREE.Mesh(
+            new THREE.SphereGeometry(0.24, 24, 24),
+            new THREE.MeshStandardMaterial({ color: it.color, roughness: 0.25, metalness: 0.65 })
+          );
+          sphere.position.set(x, y, z);
+          chemGroup.add(sphere);
+        }
+      });
+
+      const verdict = document.getElementById('chem-verdict-banner');
+      if (title.toUpperCase().includes('CONB2O6')) {
+        verdict.className = 'verdict-banner';
+        verdict.innerHTML = `<strong>Caso Fisico Reale (Niobato di Cobalto CoNb₂O₆):</strong> In questa catena di spin quantistica, $\\varphi = 1.618$ emerge sperimentalmente nel rapporto energetico $E_2/E_1$ dei mesoni sotto campo magnetico critico (Gruppo di Lie $E_8$, Coldea et al., <em>Science</em> 2010).`;
+      } else if (!isNumeric) {
+        verdict.className = 'verdict-banner warn';
+        verdict.innerHTML = `<strong>Nota Critica ("Avvocato del Diavolo"):</strong> I pesi atomici di <code>${title}</code> sono stati mappati su una spirale aurea 3D per l'esplorazione visiva, ma ricorda che i rapporti di massa stechiometrici non determinano la geometria molecolare. Clicca su <strong>"Fullerene C₆₀"</strong> o <strong>"Icosaedro"</strong> qui sopra per osservare una molecola le cui coordinate cartesiane 3D dipendono fisicamente da $\\varphi$.`;
+      } else {
+        verdict.className = 'verdict-banner';
+        verdict.innerHTML = `<strong>Analisi Serie Numerica:</strong> Verifica nella tabella se il rapporto tra termini consecutivi $x_{n+1}/x_n$ converge asintoticamente a $\\varphi \\approx 1.618034$.`;
+      }
+
+      draw2DRadialAnalysis(items);
+    }
+
+    function draw2DRadialAnalysis(items) {
+      const c = document.getElementById('chem2d-canvas');
+      const ctx = c.getContext('2d');
+      const w = c.width, h = c.height, cx = w / 2, cy = h / 2;
+      ctx.clearRect(0, 0, w, h);
+
+      [38, 62, 100, 135].forEach(r => {
+        ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(212, 175, 55, 0.16)'; ctx.stroke();
+      });
+
+      const maxV = Math.max(...items.map(i => i.val), 1);
+      items.forEach((it, idx) => {
+        const ang = (idx + 1) * GOLDEN_ANGLE_DEG * Math.PI / 180;
+        const r = 28 + (it.val / maxV) * 102;
+        const x = cx + r * Math.cos(ang);
+        const y = cy + r * Math.sin(ang);
+
+        ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(x, y);
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.45)'; ctx.stroke();
+
+        ctx.beginPath(); ctx.arc(x, y, 5.5, 0, Math.PI * 2);
+        ctx.fillStyle = '#d4af37'; ctx.fill();
+
+        ctx.fillStyle = '#f8fafc'; ctx.font = '10px JetBrains Mono';
+        ctx.fillText(it.label.split(' ')[0], x + 7, y + 3);
+      });
+    }
+
+    // =========================================================================
+    // SEZIONE 01: IDENTITÀ DI CASSINI, SOMME DI FIBONACCI E MEDIE METALLICHE
+    // =========================================================================
+    function fib(n) {
+      let a = 0, b = 1;
+      for (let i = 0; i < n; i++) { const t = a + b; a = b; b = t; }
+      return a;
+    }
+
+    function updateMathSection() {
+      const n = parseInt(document.getElementById('cassini-n-slider').value, 10);
+      const k = parseInt(document.getElementById('metallic-k-slider').value, 10);
+
+      const fn = fib(n), fn1 = fib(n + 1), fn_1 = fib(n - 1), fn2 = fib(n + 2);
+      const cassiniSign = (n % 2 === 0) ? '+1' : '−1';
+
+      let sumLin = 0, sumSq = 0;
+      for (let i = 0; i <= n; i++) {
+        const f = fib(i);
+        sumLin += f;
+        sumSq += f * f;
+      }
+
+      const metallicVal = (k + Math.sqrt(k * k + 4)) / 2;
+      const metallicNames = {1: 'Aurea (φ)', 2: 'Argento (σ₂)', 3: 'Bronzo (σ₃)', 4: 'Rame (σ₄)', 5: 'Nichel (σ₅)'};
+
+      document.getElementById('cassini-n-lbl').textContent = `n = ${n} (Fₙ = ${fn})`;
+      document.getElementById('metallic-k-lbl').textContent = `k = ${k} (${metallicNames[k]})`;
+      document.getElementById('m-cassini-eq').textContent = `${fn1}×${fn_1} − ${fn}² = ${cassiniSign}`;
+      document.getElementById('m-sum-lin').textContent = `${sumLin} = ${fn2} − 1`;
+      document.getElementById('m-sum-sq').textContent = `${sumSq} = ${fn} × ${fn1}`;
+      document.getElementById('m-metallic-val').textContent = metallicVal.toFixed(6);
+      document.getElementById('m-metallic-cf').textContent = `[${k}; ${k}, ${k}, ${k}, ...]`;
+
+      // Disegna grafico convergenza + rettangolo di Fibonacci F_n x F_{n+1}
+      const c = document.getElementById('math-cassini-canvas');
+      const ctx = c.getContext('2d');
+      const w = c.width, h = c.height;
+      ctx.clearRect(0, 0, w, h);
+
+      // Linea asintotica di φ
+      const yPhi = h * 0.5;
+      ctx.beginPath(); ctx.moveTo(40, yPhi); ctx.lineTo(w - 20, yPhi);
+      ctx.strokeStyle = 'rgba(212, 175, 55, 0.5)'; ctx.setLineDash([5, 5]); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = '#d4af37'; ctx.font = '11px JetBrains Mono';
+      ctx.fillText('Asintoto φ = 1.6180339887', 50, yPhi - 8);
+
+      ctx.beginPath();
+      for (let i = 2; i <= 16; i++) {
+        const ratio = fib(i + 1) / fib(i);
+        const diff = ratio - PHI;
+        const x = 45 + ((i - 2) / 14) * (w - 80);
+        const y = yPhi - diff * 550;
+        if (i === 2) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 2.2; ctx.stroke();
+
+      for (let i = 2; i <= 16; i++) {
+        const ratio = fib(i + 1) / fib(i);
+        const diff = ratio - PHI;
+        const x = 45 + ((i - 2) / 14) * (w - 80);
+        const y = yPhi - diff * 550;
+        ctx.beginPath(); ctx.arc(x, y, i === n ? 6 : 3.5, 0, Math.PI * 2);
+        ctx.fillStyle = i === n ? '#10b981' : '#f3e5ab'; ctx.fill();
+      }
+    }
+
+    // =========================================================================
+    // SEZIONE 02: TORO KAM 3D
+    // =========================================================================
+    let kamScene, kamCamera, kamRenderer, kamGroup;
+    let kamRatio = PHI, kamEps = 0.12;
+
+    function initKam3D() {
+      const container = document.getElementById('kam3d-container');
+      const w = container.clientWidth || 500, h = container.clientHeight || 360;
+      kamScene = new THREE.Scene();
+      kamCamera = new THREE.PerspectiveCamera(45, w / h, 0.1, 1000);
+      kamCamera.position.set(0, 3.2, 6.2);
+      kamCamera.lookAt(0, 0, 0);
+
+      kamRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      kamRenderer.setSize(w, h);
+      kamRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      container.appendChild(kamRenderer.domElement);
+
+      kamScene.add(new THREE.AmbientLight(0xffffff, 0.7));
+      const pl = new THREE.PointLight(0xd4af37, 1.3, 50); pl.position.set(5, 8, 5); kamScene.add(pl);
+
+      kamGroup = new THREE.Group();
+      kamScene.add(kamGroup);
+      attachDragRotation(container, kamGroup, kamCamera);
+      rebuildKamTorus();
+    }
+
+    function rebuildKamTorus() {
+      clearAndDisposeGroup(kamGroup);
+      const torusMesh = new THREE.Mesh(
+        new THREE.TorusGeometry(2.0, 0.72, 24, 64),
+        new THREE.MeshBasicMaterial({ color: 0x334155, wireframe: true, transparent: true, opacity: 0.25 })
+      );
+      kamGroup.add(torusMesh);
+
+      const pts = [];
+      const isRational = Math.abs(kamRatio - 1.5) < 0.01 || Math.abs(kamRatio - 2.0) < 0.01;
+      for (let i = 0; i < 1600; i++) {
+        const t = i * 0.05;
+        const u = t;
+        const v = t * kamRatio + (isRational ? kamEps * Math.sin(3 * t) * (i / 250) : kamEps * 0.15 * Math.sin(t));
+        const rTube = 0.74 + (isRational ? kamEps * 0.45 * Math.cos(5 * t) * (i / 600) : 0);
+        const R = 2.0;
+        pts.push(new THREE.Vector3(
+          (R + rTube * Math.cos(v)) * Math.cos(u),
+          (R + rTube * Math.cos(v)) * Math.sin(u),
+          rTube * Math.sin(v)
+        ));
+      }
+      const line = new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints(pts),
+        new THREE.LineBasicMaterial({ color: isRational ? 0xf43f5e : 0xd4af37 })
+      );
+      kamGroup.add(line);
+
+      document.getElementById('kam-status-lbl').textContent = isRational
+        ? `Risonanza Razionale (${kamRatio.toFixed(2)}): Risonanza Distruttiva!`
+        : `Rapporto Irrazionale (${kamRatio.toFixed(6)}): Toro Invariante Stabile`;
+    }
+
+    function updateKamSimulation(val) {
+      kamRatio = parseFloat(val);
+      document.getElementById('kam-ratio-val').textContent = kamRatio.toFixed(6);
+      rebuildKamTorus();
+    }
+
+    function updateKamPerturbation(val) {
+      kamEps = parseFloat(val);
+      document.getElementById('kam-eps-val').textContent = kamEps.toFixed(2);
+      rebuildKamTorus();
+    }
+
+    // =========================================================================
+    // SEZIONE 03: FILLOTASSI, LUCAS & NAUTILUS
+    // =========================================================================
+    let bioMode = 'phyllotaxis';
+
+    function setBioMode(m) {
+      bioMode = m;
+      document.getElementById('bio-controls-phyllo').style.display = m === 'phyllotaxis' ? 'grid' : 'none';
+      if (m === 'phyllotaxis') updateBioPhyllo();
+      else renderNautilusComparison();
+    }
+
+    function updateBioPhyllo() {
+      if (bioMode !== 'phyllotaxis') return;
+      const c = document.getElementById('bio-sim-canvas');
+      const ctx = c.getContext('2d');
+      const w = c.width, h = c.height, cx = w / 2, cy = h / 2;
+      const angleDeg = parseFloat(document.getElementById('bio-angle-slider').value);
+      const count = parseInt(document.getElementById('bio-count-slider').value, 10);
+
+      document.getElementById('bio-angle-lbl').textContent = angleDeg.toFixed(3) + '°';
+      document.getElementById('bio-count-lbl').textContent = count;
+
+      let regimeTxt = `Divergenza: ${angleDeg.toFixed(2)}°`;
+      if (Math.abs(angleDeg - GOLDEN_ANGLE_DEG) < 0.15) regimeTxt += ' (Aureo → Parastichie di Fibonacci 21/34)';
+      else if (Math.abs(angleDeg - 99.50155) < 0.2) regimeTxt += ' (Angolo di Lucas → Parastichie di Lucas 11/18)';
+      else if (Math.abs(angleDeg - 90) < 0.2) regimeTxt += ' (Fillotassi Decussata a Coppie Ortogonali)';
+      else if (Math.abs(angleDeg - 180) < 0.2) regimeTxt += ' (Fillotassi Distica su 2 Ranghi)';
+      document.getElementById('bio-stage-lbl').textContent = regimeTxt;
+
+      ctx.clearRect(0, 0, w, h);
+      for (let n = 1; n <= count; n++) {
+        const a = n * angleDeg * Math.PI / 180;
+        const r = 6.8 * Math.sqrt(n);
+        const x = cx + r * Math.cos(a);
+        const y = cy + r * Math.sin(a);
+        ctx.beginPath(); ctx.arc(x, y, 3.2, 0, Math.PI * 2);
+        ctx.fillStyle = n % 21 === 0 ? '#10b981' : (n % 13 === 0 ? '#d4af37' : '#38bdf8');
+        ctx.fill();
+      }
+    }
+
+    function renderNautilusComparison() {
+      const c = document.getElementById('bio-sim-canvas');
+      const ctx = c.getContext('2d');
+      const w = c.width, h = c.height, cx = w / 2, cy = h / 2;
+      ctx.clearRect(0, 0, w, h);
+
+      document.getElementById('bio-stage-lbl').textContent = 'Oro: Vera Spirale Aurea (φ=1.618) vs Ciano: Nautilus Reale (1.31)';
+
+      const bPhi = Math.log(PHI) / (Math.PI / 2);
+      ctx.beginPath();
+      for (let t = 0; t <= 3.7 * Math.PI; t += 0.03) {
+        const r = 3.2 * Math.exp(bPhi * t);
+        const x = cx + r * Math.cos(t), y = cy + r * Math.sin(t);
+        if (t === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = '#d4af37'; ctx.lineWidth = 3; ctx.stroke();
+
+      const bNaut = Math.log(1.31) / (Math.PI / 2);
+      ctx.beginPath();
+      for (let t = 0; t <= 5.5 * Math.PI; t += 0.03) {
+        const r = 3.2 * Math.exp(bNaut * t);
+        const x = cx + r * Math.cos(t), y = cy + r * Math.sin(t);
+        if (t === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 3; ctx.stroke();
+    }
+
+    // =========================================================================
+    // SEZIONE 04: GOLDEN SECTION SEARCH (GSS)
+    // =========================================================================
+    let gssState = { a: 0, b: 5, iter: 0 };
+    const fObj = x => Math.pow(x - 2, 2) + 0.8 * Math.sin(1.5 * x);
+
+    function resetGSS() {
+      gssState = { a: 0, b: 5, iter: 0 };
+      renderGSS();
+    }
+
+    function stepGSS() {
+      let { a, b, iter } = gssState;
+      if (b - a < 1e-5) return;
+      const x1 = b - (b - a) / PHI;
+      const x2 = a + (b - a) / PHI;
+      if (fObj(x1) < fObj(x2)) b = x2; else a = x1;
+      gssState = { a, b, iter: iter + 1 };
+      renderGSS();
+    }
+
+    function renderGSS() {
+      const c = document.getElementById('gss-canvas');
+      const ctx = c.getContext('2d');
+      const w = c.width, h = c.height;
+      ctx.clearRect(0, 0, w, h);
+
+      const { a, b, iter } = gssState;
+      const x1 = b - (b - a) / PHI;
+      const x2 = a + (b - a) / PHI;
+      const mapX = x => 45 + (x / 5) * (w - 90);
+      const mapY = y => h - 35 - ((y + 1) / 11) * (h - 65);
+
+      ctx.fillStyle = 'rgba(212, 175, 55, 0.14)';
+      ctx.fillRect(mapX(a), 15, mapX(b) - mapX(a), h - 50);
+
+      ctx.beginPath();
+      for (let px = 0; px <= 5; px += 0.02) {
+        const cx = mapX(px), cy = mapY(fObj(px));
+        if (px === 0) ctx.moveTo(cx, cy); else ctx.lineTo(cx, cy);
+      }
+      ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 2.5; ctx.stroke();
+
+      [x1, x2].forEach((xi, idx) => {
+        const cx = mapX(xi), cy = mapY(fObj(xi));
+        ctx.beginPath(); ctx.arc(cx, cy, 5, 0, Math.PI * 2);
+        ctx.fillStyle = idx === 0 ? '#10b981' : '#f43f5e'; ctx.fill();
+      });
+
+      const xm = (a + b) / 2;
+      document.getElementById('gss-iter-lbl').textContent = `Iterazione: ${iter} | Intervallo: [${a.toFixed(4)}, ${b.toFixed(4)}]`;
+      document.getElementById('gss-a-val').textContent = a.toFixed(5);
+      document.getElementById('gss-b-val').textContent = b.toFixed(5);
+      document.getElementById('gss-xmin-val').textContent = xm.toFixed(5);
+      document.getElementById('gss-width-val').textContent = (b - a).toFixed(5);
+    }
+
+    // =========================================================================
+    // SEZIONE 05: ARCHITETTURA 3D (MODULOR, LOGONE-BIRNI, KEPLERO, GIRIH)
+    // =========================================================================
+    let archScene, archCamera, archRenderer, archGroup;
+
+    function initArch3D() {
+      const container = document.getElementById('arch3d-container');
+      const w = container.clientWidth || 500, h = container.clientHeight || 360;
+      archScene = new THREE.Scene();
+      archCamera = new THREE.PerspectiveCamera(45, w / h, 0.1, 1000);
+      archCamera.position.set(0, 2.2, 6.8);
+      archCamera.lookAt(0, 0.4, 0);
+
+      archRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      archRenderer.setSize(w, h);
+      archRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      container.appendChild(archRenderer.domElement);
+
+      archScene.add(new THREE.AmbientLight(0xffffff, 0.7));
+      const dl = new THREE.DirectionalLight(0xd4af37, 1.2); dl.position.set(5, 10, 7); archScene.add(dl);
+
+      archGroup = new THREE.Group();
+      archScene.add(archGroup);
+      attachDragRotation(container, archGroup, archCamera);
+      switchArchModel('modulor');
+    }
+
+    function switchArchModel(type) {
+      clearAndDisposeGroup(archGroup);
+      if (type === 'modulor') {
+        document.getElementById('arch3d-lbl').textContent = 'Modello 3D: Modulor di Le Corbusier (Serie Rossa & Blu)';
+        const redHeights = [0.27, 0.43, 0.70, 1.13, 1.83];
+        redHeights.forEach((h, i) => {
+          const box = new THREE.Mesh(
+            new THREE.BoxGeometry(0.55, h, 0.55),
+            new THREE.MeshStandardMaterial({ color: 0xf43f5e, transparent: true, opacity: 0.75 })
+          );
+          box.position.set(-1.3 + i * 0.65, h / 2 - 1.1, 0);
+          archGroup.add(box);
+        });
+      } else if (type === 'logone') {
+        document.getElementById('arch3d-lbl').textContent = 'African Fractals: Palazzo Reale di Logone-Birni (Camerun)';
+        // Recinti rettangolari in spirale aurea verso la corte del sovrano
+        let scale = 2.6;
+        for (let i = 0; i < 8; i++) {
+          const ang = i * (Math.PI / 2);
+          const r = scale * 0.55;
+          const enclosure = new THREE.Mesh(
+            new THREE.BoxGeometry(scale * 0.6, 0.25 + i * 0.14, scale * 0.6 / PHI),
+            new THREE.MeshStandardMaterial({ color: i === 7 ? 0xd4af37 : 0x38bdf8, wireframe: i % 2 === 1 })
+          );
+          enclosure.position.set(r * Math.cos(ang), (0.25 + i * 0.14) / 2 - 1.0, r * Math.sin(ang));
+          enclosure.rotation.y = ang;
+          archGroup.add(enclosure);
+          scale *= INV_PHI;
+        }
+      } else if (type === 'kepler') {
+        document.getElementById('arch3d-lbl').textContent = 'Piramide di Keplero (Base 1, Altezza √φ ≈ 1.272, Apotema φ)';
+        const hPyr = Math.sqrt(PHI) * 1.6;
+        const pyr = new THREE.Mesh(
+          new THREE.ConeGeometry(1.6 * Math.SQRT2, hPyr, 4),
+          new THREE.MeshStandardMaterial({ color: 0xd4af37, roughness: 0.35, metalness: 0.5 })
+        );
+        pyr.rotation.y = Math.PI / 4;
+        archGroup.add(pyr);
+      } else {
+        document.getElementById('arch3d-lbl').textContent = 'Quasicristallo Decagonale Islamico (Girih / Penrose)';
+        for (let ring = 1; ring <= 3; ring++) {
+          const n = 10 * ring;
+          const rad = ring * 0.85;
+          for (let k = 0; k < n; k++) {
+            const a = (k / n) * Math.PI * 2;
+            const tile = new THREE.Mesh(
+              new THREE.CylinderGeometry(0.24, 0.24, 0.14, 10),
+              new THREE.MeshStandardMaterial({ color: ring % 2 === 0 ? 0x38bdf8 : 0xd4af37 })
+            );
+            tile.position.set(rad * Math.cos(a), 0, rad * Math.sin(a));
+            tile.rotation.x = Math.PI / 2;
+            archGroup.add(tile);
+          }
+        }
+      }
+    }
+
+    function updateModulorCalc(hCm) {
+      const h = parseFloat(hCm);
+      document.getElementById('mod-h-lbl').textContent = `${h} cm`;
+      const navel = h * INV_PHI;
+      const arm = navel * 2;
+      document.getElementById('modulor-series-out').textContent =
+        `Plesso Solare: ${navel.toFixed(1)} cm | Braccio Alzato: ${arm.toFixed(1)} cm`;
+    }
+
+    // =========================================================================
+    // SEZIONE 06: SINTETIZZATORE 833 CENT & AUDIT MUSICALE A 4 LIVELLI
+    // =========================================================================
+    let audioCtx = null;
+
+    function playFreq(freq, duration = 0.55) {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const now = audioCtx.currentTime;
+      const osc1 = audioCtx.createOscillator();
+      const osc2 = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc1.type = 'triangle';
+      osc2.type = 'sine';
+      osc1.frequency.setValueAtTime(freq, now);
+      osc2.frequency.setValueAtTime(freq * PHI, now);
+
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.exponentialRampToValueAtTime(0.22, now + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+      osc1.connect(gain); osc2.connect(gain); gain.connect(audioCtx.destination);
+      osc1.start(now); osc2.start(now);
+      osc1.stop(now + duration); osc2.stop(now + duration);
+    }
+
+    function buildSynthKeyboard() {
+      const mode = document.getElementById('synth-scale-select').value;
+      const container = document.getElementById('synth-keyboard-container');
+      container.innerHTML = '';
+      const f0 = 220;
+
+      for (let i = 0; i <= 7; i++) {
+        let freq = f0, cents = 0;
+        if (mode === '833') {
+          cents = i * (833.09 / 5);
+          freq = f0 * Math.pow(2, cents / 1200);
+        } else if (mode === 'bp') {
+          freq = f0 * Math.pow(3, i / 13);
+          cents = 1200 * Math.log2(freq / f0);
+        } else {
+          freq = f0 * Math.pow(2, i / 12);
+          cents = i * 100;
+        }
+        const btn = document.createElement('div');
+        btn.className = 'synth-key';
+        btn.innerHTML = `<span class="k-step">Grado ${i}</span><span class="k-freq">${freq.toFixed(1)} Hz</span><span class="k-cent">${cents.toFixed(0)} ct</span>`;
+        btn.onclick = () => {
+          btn.classList.add('playing');
+          playFreq(freq);
+          setTimeout(() => btn.classList.remove('playing'), 300);
+        };
+        container.appendChild(btn);
+      }
+    }
+
+    function updateMusicalAudit() {
+      const T = parseFloat(document.getElementById('mus-total-t').value) || 100;
+      const ti = parseFloat(document.getElementById('mus-event-t').value) || 61.8;
+      const n = parseInt(document.getElementById('mus-events-n').value, 10) || 10;
+      const level = parseInt(document.getElementById('mus-doc-proof').value, 10);
+
+      const pi = ti / T;
+      const w = 0.04; // Finestra tolleranza ±2%
+      const pRandom = (1 - Math.pow(1 - w, n)) * 100;
+
+      // Confronto simultaneo con le 5 ipotesi del protocollo
+      const hypotheses = [
+        { name: 'Sezione Aurea φ (0.618)', val: INV_PHI },
+        { name: 'Simmetria Perfetta (0.500)', val: 0.500 },
+        { name: 'Rapporto Semplice 3:5 (0.600)', val: 0.600 },
+        { name: 'Due Terzi 2/3 (0.667)', val: 2/3 },
+        { name: 'Asimmetria 7/10 (0.700)', val: 0.700 }
+      ].map(h => ({ ...h, dist: Math.abs(pi - h.val) })).sort((a, b) => a.dist - b.dist);
+
+      const levelLabels = {
+        1: 'Livello 1 (Sola Corrispondenza Numerica — Insufficiente per provare intenzionalità)',
+        2: 'Livello 2 (Coerenza Strutturale/Dinamica al punto aureo)',
+        3: 'Livello 3 (Intenzionalità Documentata da schizzi/fonti)',
+        4: 'Livello 4 (Efficacia Percettiva dimostrata sperimentalmente)'
+      };
+
+      const out = document.getElementById('mus-audit-output');
+      out.className = (hypotheses[0].name.includes('Aurea') && pRandom < 35 && level >= 2) ? 'verdict-banner' : 'verdict-banner warn';
+      out.innerHTML = `
+        <strong>Posizione Relativa: $p_i = ${pi.toFixed(4)}$</strong> (Scarto da $\\varphi$: ${(Math.abs(pi - INV_PHI)*100).toFixed(2)}%)<br>
+        • <strong>Ipotesi più vicina:</strong> ${hypotheses[0].name} (distanza: ${hypotheses[0].dist.toFixed(4)}) vs seconda: ${hypotheses[1].name} (${hypotheses[1].dist.toFixed(4)}).<br>
+        • <strong>Rischio Falso Positivo ($n=${n}$ eventi):</strong> Probabilità che almeno un evento cada entro $\\pm 2\\%$ da $\\varphi$ per puro caso = <strong>${pRandom.toFixed(1)}%</strong>.<br>
+        • <strong>Grado Epistemologico Raggiunto:</strong> ${levelLabels[level]}.
+      `;
+    }
+
+    // =========================================================================
+    // SEZIONE 07: SIMULATORE BIOMECCANICO 3D DI TANGO, DISSOCIAZIONE & METRONOMO
+    // =========================================================================
+    let tangoScene, tangoCamera, tangoRenderer, tangoGroup;
+    let fibMetroInterval = null;
+
+    function initTango3D() {
+      const container = document.getElementById('tango3d-container');
+      const w = container.clientWidth || 500, h = container.clientHeight || 380;
+      tangoScene = new THREE.Scene();
+      tangoCamera = new THREE.PerspectiveCamera(45, w / h, 0.1, 1000);
+      tangoCamera.position.set(0, 1.8, 5.8);
+      tangoCamera.lookAt(0, 0.2, 0);
+
+      tangoRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      tangoRenderer.setSize(w, h);
+      tangoRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      container.appendChild(tangoRenderer.domElement);
+
+      tangoScene.add(new THREE.AmbientLight(0xffffff, 0.7));
+      const pl = new THREE.PointLight(0xd4af37, 1.4, 50); pl.position.set(5, 8, 5); tangoScene.add(pl);
+
+      tangoGroup = new THREE.Group();
+      tangoScene.add(tangoGroup);
+      attachDragRotation(container, tangoGroup, tangoCamera);
+      updateTangoBiomechanics();
+    }
+
+    function updateTangoBiomechanics() {
+      clearAndDisposeGroup(tangoGroup);
+      const torsionDeg = parseFloat(document.getElementById('tango-torsion-slider').value);
+      const foreWeight = parseFloat(document.getElementById('tango-weight-slider').value);
+      const omega = parseFloat(document.getElementById('tango-omega-slider').value);
+      const sessionMin = parseFloat(document.getElementById('tango-time-slider').value);
+
+      document.getElementById('tango-torsion-lbl').textContent = `${torsionDeg.toFixed(1)}°`;
+      document.getElementById('tango-weight-lbl').textContent = `${foreWeight.toFixed(1)}% Avampiede`;
+      document.getElementById('tango-omega-lbl').textContent = `${omega.toFixed(1)} rad/s`;
+
+      const mainMin = (sessionMin * INV_PHI).toFixed(1);
+      const compMin = (sessionMin - sessionMin * INV_PHI).toFixed(1);
+      document.getElementById('tango-time-lbl').textContent = `${sessionMin}m → ${mainMin}m / ${compMin}m`;
+
+      // Disco pavimento / Poligono d'appoggio (parquet)
+      const floor = new THREE.Mesh(
+        new THREE.CylinderGeometry(1.7, 1.7, 0.05, 36),
+        new THREE.MeshStandardMaterial({ color: 0x1e293b, transparent: true, opacity: 0.7 })
+      );
+      floor.position.y = -1.45;
+      tangoGroup.add(floor);
+
+      // Piede di base (Avampiede + Tacco)
+      const foreCol = (foreWeight >= 58 && foreWeight <= 75) ? 0x10b981 : 0xf59e0b;
+      const forefoot = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.28, 0.28, 0.12, 24),
+        new THREE.MeshStandardMaterial({ color: foreCol })
+      );
+      forefoot.position.set(0, -1.36, 0.18);
+      tangoGroup.add(forefoot);
+
+      const heel = new THREE.Mesh(
+        new THREE.BoxGeometry(0.24, 0.10, 0.35),
+        new THREE.MeshStandardMaterial({ color: 0x64748b })
+      );
+      heel.position.set(0, -1.36, -0.25);
+      tangoGroup.add(heel);
+
+      // Asse verticale di riferimento (Filo a piombo)
+      const axisMat = new THREE.LineBasicMaterial({ color: torsionDeg > 70 ? 0xf43f5e : 0xd4af37 });
+      const axisLine = new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, -1.4, 0.18), new THREE.Vector3(0, 1.5, 0.18)]),
+        axisMat
+      );
+      tangoGroup.add(axisLine);
+
+      // Bacino (Pelvi) e Torace dissociato a spirale
+      const steps = 10;
+      for (let i = 0; i <= steps; i++) {
+        const frac = i / steps;
+        const y = -0.8 + frac * 1.75;
+        const ang = (frac * torsionDeg) * Math.PI / 180;
+        const wBar = 0.75 + frac * 0.45; // Proporzione torace/bacino
+        const bar = new THREE.Mesh(
+          new THREE.BoxGeometry(wBar, 0.07, 0.22),
+          new THREE.MeshStandardMaterial({
+            color: i === steps ? 0xd4af37 : (i === 0 ? 0x38bdf8 : 0x94a3b8),
+            roughness: 0.3
+          })
+        );
+        // Se la torsione supera il limite fisiologico (70°), mostra la perdita d'asse laterale
+        const swayX = torsionDeg > 70 ? ((torsionDeg - 70) / 67) * 0.35 * frac : 0;
+        bar.position.set(swayX, y, 0.18);
+        bar.rotation.y = ang;
+        tangoGroup.add(bar);
+      }
+
+      // Testa / Vertice asse
+      const head = new THREE.Mesh(
+        new THREE.SphereGeometry(0.2, 24, 24),
+        new THREE.MeshStandardMaterial({ color: 0xf3e5ab })
+      );
+      const topSway = torsionDeg > 70 ? ((torsionDeg - 70) / 67) * 0.35 : 0;
+      head.position.set(topSway, 1.25, 0.18);
+      tangoGroup.add(head);
+
+      // Verdetto biomeccanico scientifico
+      const vBox = document.getElementById('tango-verdict-box');
+      if (torsionDeg <= 65 && foreWeight >= 58 && foreWeight <= 75) {
+        vBox.className = 'verdict-banner';
+        vBox.innerHTML = `<strong>Assetto Biomeccanico Funzionale Ottimale:</strong> Dissociazione toraco-pelvica di <strong>${torsionDeg.toFixed(1)}°</strong> dentro il range fisiologico sicuro ($35^\\circ\\text{–}65^\\circ$) con il <strong>${foreWeight.toFixed(1)}%</strong> del peso proiettato sull'avampiede (prossimo alla ripartizione aurea $61.8\\% / 38.2\\%$), liberando il tacco dall'attrito radente durante il pivot. Sessione suddivisa in <strong>${mainMin} min</strong> di pratica e <strong>${compMin} min</strong> di tecnica.`;
+      } else {
+        vBox.className = 'verdict-banner warn';
+        vBox.innerHTML = `<strong>Allerta Biomeccanica ("Avvocato del Diavolo"):</strong> ${torsionDeg > 65 ? `Una torsione di <strong>${torsionDeg.toFixed(1)}°</strong> (cercando di imitare l'angolo aureo $137.5^\\circ$) supera la mobilità vertebrale toracica senza rotazione del piede di base, causando l'inclinazione dell'asse (in rosso)! ` : ''}Come avverte il protocollo nella Sezione 10, nel movimento umano la stabilità funzionale dell'asse prevale sempre sul feticismo geometrico di $\\varphi$.`;
+      }
+    }
+
+    function toggleFibonacciMetronome() {
+      const btn = document.getElementById('btn-tango-metronome');
+      if (fibMetroInterval) {
+        clearInterval(fibMetroInterval);
+        fibMetroInterval = null;
+        btn.textContent = '🥁 Avvia Metronomo Fibonacci (1-1-2-3-5)';
+        return;
+      }
+      btn.textContent = '⏹ Ferma Metronomo Cinetico';
+      // Cellula ritmica di Fibonacci: accenti sui battiti 1, 2, 4, 7, 12
+      const pattern = [440, 440, 293.66, 587.33, 293.66, 293.66, 712.4, 293.66];
+      let step = 0;
+      fibMetroInterval = setInterval(() => {
+        playFreq(pattern[step % pattern.length], 0.18);
+        step++;
+      }, 380);
+    }
+
+    // =========================================================================
+    // CONTROLLI MOUSE E LOOP UNIFICATO CON PAUSA AUTOMATICA FUORI SCHERMO
+    // =========================================================================
+    function attachDragRotation(domEl, group, camera) {
+      let dragging = false, px = 0, py = 0;
+      domEl.addEventListener('pointerdown', e => { dragging = true; px = e.clientX; py = e.clientY; });
+      window.addEventListener('pointerup', () => { dragging = false; });
+      window.addEventListener('pointermove', e => {
+        if (!dragging) return;
+        group.rotation.y += (e.clientX - px) * 0.008;
+        group.rotation.x += (e.clientY - py) * 0.008;
+        px = e.clientX; py = e.clientY;
+      });
+    }
+
+    function animateAllWebGL() {
+      requestAnimationFrame(animateAllWebGL);
+      if (chemGroup && visibleWebGLIds.has('chem3d-container')) {
+        chemGroup.rotation.y += 0.0045;
+        chemRenderer.render(chemScene, chemCamera);
+      }
+      if (kamGroup && visibleWebGLIds.has('kam3d-container')) {
+        kamGroup.rotation.z += 0.004;
+        kamRenderer.render(kamScene, kamCamera);
+      }
+      if (archGroup && visibleWebGLIds.has('arch3d-container')) {
+        archGroup.rotation.y += 0.004;
+        archRenderer.render(archScene, archCamera);
+      }
+      if (tangoGroup && visibleWebGLIds.has('tango3d-container')) {
+        const omega = parseFloat(document.getElementById('tango-omega-slider').value) || 0;
+        tangoGroup.rotation.y += omega * 0.012;
+        tangoRenderer.render(tangoScene, tangoCamera);
+      }
+    }
+
+    function onAllThreeResize() {
+      const pairs = [
+        ['chem3d-container', chemCamera, chemRenderer],
+        ['kam3d-container', kamCamera, kamRenderer],
+        ['arch3d-container', archCamera, archRenderer],
+        ['tango3d-container', tangoCamera, tangoRenderer]
+      ];
+      pairs.forEach(([id, cam, ren]) => {
+        const el = document.getElementById(id);
+        if (el && cam && ren && el.clientWidth > 0 && el.clientHeight > 0) {
+          cam.aspect = el.clientWidth / el.clientHeight;
+          cam.updateProjectionMatrix();
+          ren.setSize(el.clientWidth, el.clientHeight);
+        }
+      });
+    }
+
+    // =========================================================================
+    // MODALE GITHUB + CLAUDE CODE (SOLO MODALITÀ A: CLAUDE GITHUB APP)
+    // =========================================================================
+    function openGithubModal() { document.getElementById('github-modal').classList.add('open'); }
+    function closeGithubModal() { document.getElementById('github-modal').classList.remove('open'); }
+
+    function getFullHtmlSource() {
+      return '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+    }
+
+    function getClaudeMdSource() {
+      return `# CLAUDE.md — Istruzioni Ufficiali per Claude GitHub App (Modalità A)
+
+## 1. Modalità Operativa (Claude Code Web / App Diretta senza API Key)
+Questo repository è progettato per essere gestito direttamente tramite la **Claude GitHub App** (\`https://github.com/apps/claude\`) e l'interfaccia **Claude Code** (\`claude.ai/code\` o app desktop Claude) collegata all'abbonamento dell'utente, senza chiavi API a consumo.
+
+## 2. Guardia Epistemologica ("Avvocato del Diavolo" & Anti-Mito)
+Ogni modifica operata da Claude deve rispettare l'equazione cardine del progetto:
+$$\\text{Proporzione Aurea} = \\text{Modello Generativo} + \\text{Test Empirico} - \\text{Mito Estetico}$$
+1. **Immagini (Filtro di Sobel)**: L'analisi focale dei pixel deve avvenire SEMPRE sul buffer offscreen pulito (\`cleanOffscreenCanvas\`) prima di tracciare gli overlay geometrici, confrontando $\\varphi$ ($1.618$) con la Regola dei Terzi ($1.500$) e il rapporto $\\sqrt{2}$ ($1.414$).
+2. **Chimica e Cristallografia**: Distinguere rigorosamente la numerologia sui pesi atomici dalla vera geometria molecolare 3D icosaedrica (es. Fullerene $\\text{C}_{60}$ con coordinate $(0, \\pm 1, \\pm 3\\varphi)$ e catena magnetica $\\text{CoNb}_2\\text{O}_6$).
+3. **Biologia**: Includere sempre le eccezioni non-Fibonacci (Serie di Lucas $2,1,3,4,7,11,18$ a $99.5^\\circ$, fillotassi decussata a $90^\\circ$) e ricordare che il *Nautilus pompilius* cresce in media di $1.31$, non $1.618$.
+4. **Musica e Biomeccanica**: Applicare i 4 livelli probatori nell'analisi musicale e rispettare i limiti articolari fisiologici ($35^\\circ\\text{–}65^\\circ$) nella dissociazione toraco-pelvica del Tango.
+
+## 3. Regole Tecniche WebGL
+- Usare sempre \`clearAndDisposeGroup(group)\` per liberare \`geometry.dispose()\` e \`material.dispose()\` nella GPU ad ogni cambio modello.
+`;
+    }
+
+    function getReadmeSource() {
+      return `# PHI-LAB v2.0 // Laboratorio Universale sulla Sezione Aurea (φ)
+
+Applicazione scientifica interattiva pronta per **GitHub Pages** e configurata per **Claude GitHub App (Modalità A)**.
+
+## Funzionalità Principali v2.0
+1. **Modulo A (Immagini + Algoritmo Anti-Bias di Sobel)**: calcolo della mappa di salienza sui pixel puliti, auto-rotazione della spirale, confronto oggettivo con Regola dei Terzi e $\\sqrt{2}$, e *Smart Auto-Crop* centrato sul soggetto.
+2. **Modulo B (Vera Cristallografia 3D & Parser Chimico)**: Fullerene $\\text{C}_{60}$ con coordinate auree esatte $(0, \\pm 1, \\pm 3\\varphi)$, Icosaedro Platonico, catena di spin $\\text{CoNb}_2\\text{O}_6$, parser con parentesi e pedici Unicode, e analizzatore di coordinate molecolari \`.xyz\`.
+3. **7 Laboratori Autonomi**: Identità di Cassini e Medie Metalliche, Toro KAM 3D, Fillotassi con Serie di Lucas e Nautilus, Golden Section Search, Architettura (Modulor, Piramide di Keplero, Girih, Palazzo Africano di Logone-Birni e Audit delle Religioni), Sintetizzatore 833 Cent + Audit Musicale a 4 livelli, e Simulatore Biomeccanico 3D di Tango e Ritmo di Fibonacci.
+`;
+    }
+
+    function getPythonGssSource() {
+      return `import math
+
+PHI = (1 + math.sqrt(5)) / 2
+
+def golden_section_search(f, a, b, tol=1e-7, max_iter=200):
+    x1 = b - (b - a) / PHI
+    x2 = a + (b - a) / PHI
+    f1, f2 = f(x1), f(x2)
+    it = 0
+    while abs(b - a) > tol and it < max_iter:
+        if f1 < f2:
+            b, x2, f2 = x2, x1, f1
+            x1 = b - (b - a) / PHI
+            f1 = f(x1)
+        else:
+            a, x1, f1 = x1, x2, f2
+            x2 = a + (b - a) / PHI
+            f2 = f(x2)
+        it += 1
+    xm = (a + b) / 2
+    return {"x_min": xm, "f_min": f(xm), "iterations": it}
+
+if __name__ == "__main__":
+    res = golden_section_search(lambda x: (x - 2)**2, 0, 5)
+    print("Risultato GSS:", res)
+`;
+    }
+
+    function downloadSingleFile(filename, content) {
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      a.click();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      ['chem3d-container', 'kam3d-container', 'arch3d-container', 'tango3d-container'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) webglIntersectionObs.observe(el);
+      });
+      loadPresetImage('sunflower');
+      initChem3D();
+      initKam3D();
+      initArch3D();
+      initTango3D();
+      updateMathSection();
+      updateBioPhyllo();
+      resetGSS();
+      buildSynthKeyboard();
+      updateMusicalAudit();
+      animateAllWebGL();
+      window.addEventListener('resize', onAllThreeResize);
+    });
+  </script>
+</body>
+</html>
